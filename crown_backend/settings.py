@@ -133,3 +133,8 @@ if ENVIRONMENT == "staging":
 else:
     from crown_backend.crown_settings.local import *
 
+
+print()
+print("ENVIRONMENT")
+print(ENVIRONMENT)
+print()
