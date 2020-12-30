@@ -11,71 +11,9 @@ admin.site.site_header = "Crown Admin Panel"
 
 from users.models import (
     EmailUser,
-    EmailUserAddress,
-    State,
-    BankAccount,
     PasswordToken,
     MobileToken,
 )
-
-
-@admin.register(BankAccount)
-class BankAccountAdmin(admin.ModelAdmin):
-
-    search_fields = ["id"]
-
-    list_filters = ["account_type"]
-
-    list_display = [
-        "id",
-        "account_name",
-        "account_number",
-        "bank_name",
-        "ifsc_code",
-        "account_type",
-        "created_at",
-        "modified_at",
-    ]
-
-    list_per_page = 25
-
-
-@admin.register(EmailUserAddress)
-class EmailUserAddressAdmin(admin.ModelAdmin):
-
-    search_fields = ["id" "pincode", "address_type", "user__id"]
-
-    list_filter = ["address_type", "is_default"]
-
-    list_display = [
-        "id",
-        "name",
-        "gstin",
-        "city",
-        "state",
-        "pincode",
-        "address_type",
-        "is_default",
-        "user",
-        "created_at",
-        "modified_at",
-    ]
-
-    list_per_page = 25
-
-
-@admin.register(State)
-class StateAdmin(admin.ModelAdmin):
-
-    list_display = [
-        "id",
-        "name",
-        "gst_code",
-        "created_at",
-        "modified_at",
-    ]
-
-    list_per_page = 50
 
 
 @admin.register(MobileToken)

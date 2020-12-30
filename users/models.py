@@ -10,49 +10,10 @@ from users.constants import USER_TYPE_CHOICES
 from users.managers import UserManager
 
 
-class State(PrimaryUUIDTimeStampedModel):
-    name = models.CharField(max_length=255)
-    gst_code = models.IntegerField()
-
-    def __str__(self):
-        return f"{self.name} - {self.gst_code}"
-
-    class Meta:
-        verbose_name = "State"
-        verbose_name_plural = "States"
-
-
-class EmailUserAddress(PrimaryUUIDTimeStampedModel):
-    ADDRESS_CHOICES = [
-        ("billing", "billing"),
-        ("shipping", "shipping"),
-    ]
-    gstin = models.CharField(max_length=15, null=True, blank=True)
-    name = models.CharField(max_length=255)
-    address = models.TextField()
-    city = models.CharField(max_length=255)
-    pincode = models.CharField(max_length=6)
-    address_type = models.CharField(
-        max_length=8, choices=ADDRESS_CHOICES, default="billing"
-    )
-
-    user = models.ForeignKey(
-        "users.EmailUser", on_delete=models.CASCADE, related_name="addresses"
-    )
-
-    state = models.ForeignKey(
-        "users.State", on_delete=models.PROTECT, related_name="addresses"
-    )
-
-    is_default = models.BooleanField(default=True)
-
-    class Meta:
-        verbose_name = "EmailUser Address"
-        verbose_name_plural = "EmailUser Addresses"
-        ordering = ["user", "address_type"]
-
-
 class EmailUser(PrimaryUUIDTimeStampedModel, AbstractUser):
+
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
 
     username = None
     email = models.EmailField("Email ID", unique=True)
@@ -120,25 +81,3 @@ class MobileToken(PrimaryUUIDTimeStampedModel):
         verbose_name = "Mobile Token"
         verbose_name_plural = "Mobile Tokens"
 
-
-class BankAccount(PrimaryUUIDTimeStampedModel):
-
-    BANK_ACCOUNT_TYPE_CHOICES = [
-        ("current", "current"),
-        ("savings", "savings"),
-    ]
-    account_name = models.CharField(max_length=255)
-    account_number = models.CharField(max_length=255)
-    bank_name = models.CharField(max_length=255)
-    ifsc_code = models.CharField(max_length=11)
-    account_type = models.CharField(
-        max_length=255, default="current", choices=BANK_ACCOUNT_TYPE_CHOICES
-    )
-
-    email_user = models.ForeignKey(
-        "users.EmailUser", related_name="bank_accounts", on_delete=models.CASCADE,
-    )
-
-    class Meta:
-        verbose_name = "Bank Account"
-        verbose_name_plural = "Bank Accounts"

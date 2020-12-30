@@ -23,3 +23,27 @@ class PrimaryUUIDModel(models.Model):
 class PrimaryUUIDTimeStampedModel(PrimaryUUIDModel, TimeStampedModel):
     class Meta:
         abstract = True
+
+
+class State(PrimaryUUIDTimeStampedModel):
+    name = models.CharField(max_length=255)
+    gst_code = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.name} - {self.gst_code}"
+
+    class Meta:
+        verbose_name = "State"
+        verbose_name_plural = "States"
+
+
+class OrderOption(PrimaryUUIDTimeStampedModel):
+    option = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.option
+
+    class Meta:
+        verbose_name = "Order Option"
+        verbose_name_plural = "Order Options"
+
