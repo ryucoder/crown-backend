@@ -88,7 +88,7 @@ class EmailUser(PrimaryUUIDTimeStampedModel, AbstractUser):
         verbose_name_plural = "Email Users"
 
 
-class ResetPasswordToken(PrimaryUUIDTimeStampedModel):
+class PasswordToken(PrimaryUUIDTimeStampedModel):
     email_user = models.ForeignKey(
         "users.EmailUser",
         related_name="reset_password_tokens",
@@ -102,8 +102,8 @@ class ResetPasswordToken(PrimaryUUIDTimeStampedModel):
         return f"{self.id}"
 
     class Meta:
-        verbose_name = "Reset Password Token"
-        verbose_name_plural = "Reset Password Tokens"
+        verbose_name = "Password Token"
+        verbose_name_plural = "Password Tokens"
         unique_together = ["email_user", "token"]
 
 

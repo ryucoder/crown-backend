@@ -14,7 +14,7 @@ from users.models import (
     EmailUserAddress,
     State,
     BankAccount,
-    ResetPasswordToken,
+    PasswordToken,
     MobileToken,
 )
 
@@ -101,8 +101,8 @@ class MobileTokenAdmin(admin.ModelAdmin):
     list_per_page = 25
 
 
-@admin.register(ResetPasswordToken)
-class ResetPasswordTokenAdmin(admin.ModelAdmin):
+@admin.register(PasswordToken)
+class PasswordTokenAdmin(admin.ModelAdmin):
     def is_expired(self, obj):
         return timezone.now() > obj.expiry
 
@@ -122,7 +122,7 @@ class ResetPasswordTokenAdmin(admin.ModelAdmin):
     ]
 
     class Meta:
-        model = ResetPasswordToken
+        model = PasswordToken
 
     list_per_page = 25
 
