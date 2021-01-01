@@ -11,5 +11,7 @@ class BusinessViewset(viewsets.ModelViewSet):
     serializer_class = BusinessSerializer
 
     def get_queryset(self):
-        queryset = Business.objects.all()
+        queryset = Business.objects.all().prefetch_related(
+            "contacts", "addresses", "accounts"
+        )
         return queryset
