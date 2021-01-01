@@ -80,4 +80,3 @@ class MobileToken(PrimaryUUIDTimeStampedModel):
     class Meta:
         verbose_name = "Mobile Token"
         verbose_name_plural = "Mobile Tokens"
-

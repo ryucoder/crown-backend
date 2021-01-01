@@ -1,4 +1,3 @@
-
 CATEGORY_CHOICES = (
     ("laboratory", "laboratory"),
     ("dentist", "dentist"),

@@ -2,13 +2,12 @@ from django.db import models
 
 from core.models import PrimaryUUIDTimeStampedModel
 
-
 from businesses.constants import CATEGORY_CHOICES, ORDER_STATUS_CHOICES
 
 
 class Business(PrimaryUUIDTimeStampedModel):
     name = models.CharField(max_length=255)
-    
+
     gstin = models.CharField(max_length=15)
 
     category = models.CharField(
@@ -20,7 +19,7 @@ class Business(PrimaryUUIDTimeStampedModel):
     )
 
     def __str__(self):
-        return str(self.id) + " - " + self.company
+        return f"{self.id} - {self.name}"
 
     class Meta:
         verbose_name = "Business"
@@ -44,7 +43,7 @@ class BusinessContact(PrimaryUUIDTimeStampedModel):
     )
 
     def __str__(self):
-        return str(self.client) + " - " + self.contact
+        return f"{self.business} - {self.contact}"
 
     class Meta:
         verbose_name = "Business Contact"
@@ -72,6 +71,11 @@ class BusinessAddress(PrimaryUUIDTimeStampedModel):
         "core.State", on_delete=models.PROTECT, related_name="addresses"
     )
 
+    is_default = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.id} - {self.business} - {self.address_type}"
+
     class Meta:
         verbose_name = "Business Address"
         verbose_name_plural = "Business Addresses"
@@ -96,6 +100,11 @@ class BusinessAccount(PrimaryUUIDTimeStampedModel):
         "businesses.Business", on_delete=models.CASCADE, related_name="accounts"
     )
 
+    is_default = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.id} - {self.business} - {self.account_type}"
+
     class Meta:
         verbose_name = "Business Account"
         verbose_name_plural = "Business Accounts"
@@ -103,7 +112,9 @@ class BusinessAccount(PrimaryUUIDTimeStampedModel):
 
 class OrderStatus(PrimaryUUIDTimeStampedModel):
 
-    status = models.CharField(max_length=255, choices=ORDER_STATUS_CHOICES, default="pending")
+    status = models.CharField(
+        max_length=255, choices=ORDER_STATUS_CHOICES, default="pending"
+    )
     order = models.ForeignKey(
         "businesses.Order", on_delete=models.CASCADE, related_name="order_statuses"
     )
@@ -134,19 +145,19 @@ class Order(PrimaryUUIDTimeStampedModel):
 
     notes = models.TextField(null=True, blank=True)
 
-    options = models.ManyToManyField(
-        "core.OrderOption", related_name="orders"
-    )
+    options = models.ManyToManyField("core.OrderOption", related_name="orders")
 
     is_urgent = models.BooleanField(default=False)
-    
+
     teeth = models.JSONField()
     # upper_left_1 = models.BooleanField(default=False, verbose_name="UL1")
     # upper_right_1 = models.BooleanField(default=False, verbose_name="UR1")
     # lower_left_1 = models.BooleanField(default=False, verbose_name="LL1")
     # lower_right_1 = models.BooleanField(default=False, verbose_name="LR1")
 
-    latest_status = models.CharField(max_length=255, choices=ORDER_STATUS_CHOICES, default="pending")
+    latest_status = models.CharField(
+        max_length=255, choices=ORDER_STATUS_CHOICES, default="pending"
+    )
 
     from_business = models.ForeignKey(
         "businesses.Business", on_delete=models.CASCADE, related_name="orders_created"
@@ -163,7 +174,7 @@ class Order(PrimaryUUIDTimeStampedModel):
     to_user = models.ForeignKey(
         "users.EmailUser", on_delete=models.CASCADE, related_name="orders_received"
     )
-    
+
     def __str__(self):
         return f"Order - {self.id}"
 

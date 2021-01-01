@@ -1,4 +1,3 @@
-
 USER_TYPE_CHOICES = (
     ("admin", "admin"),
     ("laboratory", "laboratory"),

@@ -1,6 +1,13 @@
 from django.contrib import admin
 
-from businesses.models import Business, BusinessContact, BusinessAddress, BusinessAccount, Order, OrderStatus
+from businesses.models import (
+    Business,
+    BusinessContact,
+    BusinessAddress,
+    BusinessAccount,
+    Order,
+    OrderStatus,
+)
 
 from core.models import State
 
@@ -24,7 +31,7 @@ class OrderAdmin(admin.ModelAdmin):
     ]
 
     list_per_page = 25
-    
+
 
 @admin.register(OrderStatus)
 class OrderStatusAdmin(admin.ModelAdmin):
@@ -92,6 +99,7 @@ class BusinessAddressAdmin(admin.ModelAdmin):
         "pincode",
         "address_type",
         "business",
+        "is_default",
         "created_at",
         "modified_at",
     ]
@@ -113,10 +121,9 @@ class BusinessAccountAdmin(admin.ModelAdmin):
         "bank_name",
         "ifsc_code",
         "account_type",
+        "is_default",
         "created_at",
         "modified_at",
     ]
 
     list_per_page = 25
-
-

@@ -28,4 +28,3 @@ class OrderOptionAdmin(admin.ModelAdmin):
     ]
 
     list_per_page = 50
-

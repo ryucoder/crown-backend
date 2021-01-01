@@ -1,4 +1,4 @@
-import uuid 
+import uuid
 
 from django.db import models
 
@@ -46,4 +46,3 @@ class OrderOption(PrimaryUUIDTimeStampedModel):
     class Meta:
         verbose_name = "Order Option"
         verbose_name_plural = "Order Options"
-

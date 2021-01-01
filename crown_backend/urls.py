@@ -21,13 +21,17 @@ from rest_framework.routers import DefaultRouter
 
 from core.views import StateViewset, OrderOptionViewset
 
+from businesses.views import BusinessViewset
+
+
 default_router = DefaultRouter()
-default_router.register(r'states', StateViewset, basename="states")
-default_router.register(r'order-options', OrderOptionViewset, basename="order-option")
+default_router.register(r"states", StateViewset, basename="states")
+default_router.register(r"order-options", OrderOptionViewset, basename="order-option")
+default_router.register(r"businesses", BusinessViewset, basename="businesses")
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
 ]
 
 urlpatterns += default_router.urls
