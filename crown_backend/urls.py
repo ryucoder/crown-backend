@@ -17,9 +17,21 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import path, include
 
+from rest_framework.routers import DefaultRouter
+
+from core.views import StateViewset, OrderOptionViewset
+
+default_router = DefaultRouter()
+default_router.register(r'states', StateViewset, basename="states")
+default_router.register(r'order-options', OrderOptionViewset, basename="order-option")
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 ]
+
+urlpatterns += default_router.urls
+
 
 if settings.DEBUG:
     import debug_toolbar
