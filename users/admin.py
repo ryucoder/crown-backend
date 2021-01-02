@@ -46,12 +46,13 @@ class PasswordTokenAdmin(admin.ModelAdmin):
 
     search_fields = ["id", "token"]
 
-    list_filter = ["is_used"]
+    list_filter = ["category", "is_used"]
 
     list_display = [
         "id",
         "email_user",
         "token",
+        "category",
         "is_used",
         "is_expired",
         "expiry",
