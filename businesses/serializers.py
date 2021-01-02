@@ -62,5 +62,4 @@ class BusinessSerializer(ServerErrorSerializer):
             "addresses",
             "accounts",
         ]
-        read_only_fields = ['user']
-
+        read_only_fields = ["user"]
