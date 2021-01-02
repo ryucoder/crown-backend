@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from core.serializers import ServerErrorSerializer
 from businesses.models import (
     Business,
     BusinessAccount,
@@ -43,7 +44,7 @@ class BusinessContactSerializer(serializers.ModelSerializer):
         fields = ["id", "business", "contact", "contact_type"]
 
 
-class BusinessSerializer(serializers.ModelSerializer):
+class BusinessSerializer(ServerErrorSerializer):
 
     contacts = BusinessContactSerializer(many=True, read_only=True)
     addresses = BusinessAddressSerializer(many=True, read_only=True)
@@ -61,3 +62,5 @@ class BusinessSerializer(serializers.ModelSerializer):
             "addresses",
             "accounts",
         ]
+        read_only_fields = ['user']
+
