@@ -14,9 +14,11 @@ class Business(PrimaryUUIDTimeStampedModel):
         max_length=12, choices=CATEGORY_CHOICES, default="laboratory"
     )
 
-    user = models.OneToOneField(
+    owner = models.OneToOneField(
         "users.EmailUser", related_name="business", on_delete=models.CASCADE,
     )
+
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.id} - {self.name}"
@@ -24,6 +26,23 @@ class Business(PrimaryUUIDTimeStampedModel):
     class Meta:
         verbose_name = "Business"
         verbose_name_plural = "Businesses"
+
+
+class BusinessEmployee(PrimaryUUIDTimeStampedModel):
+
+    business = models.ForeignKey(
+        "users.EmailUser", related_name="employees", on_delete=models.CASCADE,
+    )
+    employee = models.OneToOneField(
+        "users.EmailUser", related_name="employer", on_delete=models.CASCADE,
+    )
+
+    def __str__(self):
+        return f"{self.business} - {self.employee}"
+
+    class Meta:
+        verbose_name = "Business Employee"
+        verbose_name_plural = "Business Employees"
 
 
 class BusinessContact(PrimaryUUIDTimeStampedModel):

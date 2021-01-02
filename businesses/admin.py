@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from businesses.models import (
     Business,
+    BusinessEmployee,
     BusinessContact,
     BusinessAddress,
     BusinessAccount,
@@ -53,13 +54,35 @@ class OrderStatusAdmin(admin.ModelAdmin):
 @admin.register(Business)
 class BusinessAdmin(admin.ModelAdmin):
 
-    list_filter = ["user"]
+    list_filter = [
+        "owner",
+        "category",
+        "is_active",
+    ]
 
     list_display = [
         "id",
         "name",
         "gstin",
-        "user",
+        "owner",
+        "category",
+        "is_active",
+        "created_at",
+        "modified_at",
+    ]
+
+    list_per_page = 25
+
+
+@admin.register(BusinessEmployee)
+class BusinessEmployeeAdmin(admin.ModelAdmin):
+
+    list_filter = ["business"]
+
+    list_display = [
+        "id",
+        "business",
+        "employee",
         "created_at",
         "modified_at",
     ]

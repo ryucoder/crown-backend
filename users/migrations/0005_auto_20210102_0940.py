@@ -8,18 +8,26 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0004_auto_20201230_1644'),
+        ("users", "0004_auto_20201230_1644"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='passwordtoken',
-            name='category',
-            field=models.CharField(choices=[('signup', 'signup'), ('reset', 'reset')], default='signup', max_length=12),
+            model_name="passwordtoken",
+            name="category",
+            field=models.CharField(
+                choices=[("signup", "signup"), ("reset", "reset")],
+                default="signup",
+                max_length=12,
+            ),
         ),
         migrations.AlterField(
-            model_name='passwordtoken',
-            name='email_user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='password_tokens', to=settings.AUTH_USER_MODEL),
+            model_name="passwordtoken",
+            name="email_user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="password_tokens",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

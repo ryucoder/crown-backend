@@ -6,18 +6,38 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('businesses', '0003_auto_20210101_1642'),
+        ("businesses", "0003_auto_20210101_1642"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='order',
-            name='latest_status',
-            field=models.CharField(choices=[('suspended', 'suspended'), ('pending', 'pending'), ('completed', 'completed'), ('delivered', 'delivered'), ('rework', 'rework')], default='pending', max_length=255),
+            model_name="order",
+            name="latest_status",
+            field=models.CharField(
+                choices=[
+                    ("suspended", "suspended"),
+                    ("pending", "pending"),
+                    ("completed", "completed"),
+                    ("delivered", "delivered"),
+                    ("rework", "rework"),
+                ],
+                default="pending",
+                max_length=255,
+            ),
         ),
         migrations.AlterField(
-            model_name='orderstatus',
-            name='status',
-            field=models.CharField(choices=[('suspended', 'suspended'), ('pending', 'pending'), ('completed', 'completed'), ('delivered', 'delivered'), ('rework', 'rework')], default='pending', max_length=255),
+            model_name="orderstatus",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("suspended", "suspended"),
+                    ("pending", "pending"),
+                    ("completed", "completed"),
+                    ("delivered", "delivered"),
+                    ("rework", "rework"),
+                ],
+                default="pending",
+                max_length=255,
+            ),
         ),
     ]
