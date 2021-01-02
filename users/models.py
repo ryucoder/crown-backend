@@ -58,7 +58,7 @@ class PasswordToken(PrimaryUUIDTimeStampedModel):
     expiry = models.DateTimeField()
     is_used = models.BooleanField(default=False)
     category = models.CharField(
-        max_length=12, choices=PASSWORD_CATEGORY_CHOICES, default="signup"
+        max_length=6, choices=PASSWORD_CATEGORY_CHOICES, default="signup"
     )
 
     def __str__(self):

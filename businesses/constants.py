@@ -5,6 +5,7 @@ CATEGORY_CHOICES = (
 )
 
 ORDER_STATUS_CHOICES = (
+    ("suspended", "suspended"),
     ("pending", "pending"),
     ("completed", "completed"),
     ("delivered", "delivered"),
