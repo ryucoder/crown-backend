@@ -1,0 +1,32 @@
+Features 
+login 
+logout 
+signup - Dental Lab  
+confirm email 
+confirm mobile 
+reset password
+
+
+business employee - create/list/detail/edit/disable
+
+business contact - create/list/detail/edit/delete
+
+business address - create/list/detail/edit/delete
+business bank account - create/list/detail/edit/delete
+
+create dentist copany and user 
+
+order - create/list/detail/edit/disable 
+update order status 
+create order invoice
+print/download order invoice
+
+monthly aggregate of the orders 
+
+
+Workflows 
+
+
+
+
+
