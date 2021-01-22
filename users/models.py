@@ -24,7 +24,7 @@ class EmailUser(PrimaryUUIDTimeStampedModel, AbstractUser):
     objects = UserManager()
 
     user_type = models.CharField(
-        max_length=12, choices=USER_TYPE_CHOICES, default="admin"
+        max_length=8, choices=USER_TYPE_CHOICES, default="employee"
     )
 
     is_email_verified = models.BooleanField(default=False)
