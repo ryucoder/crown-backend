@@ -57,9 +57,9 @@ class BusinessSerializer(ServerErrorSerializer):
             "name",
             "gstin",
             "category",
-            "user",
+            "owner",
             "contacts",
             "addresses",
             "accounts",
         ]
-        read_only_fields = ["user"]
+        read_only_fields = ["owner"]
