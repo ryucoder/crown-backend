@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from core.serializers import ServerErrorSerializer
+
 from businesses.models import (
     Business,
     BusinessAccount,
@@ -61,5 +62,19 @@ class BusinessSerializer(ServerErrorSerializer):
             "contacts",
             "addresses",
             "accounts",
+        ]
+        read_only_fields = ["owner"]
+
+
+class BusinessOnlySerializer(ServerErrorSerializer):
+
+    class Meta:
+        model = Business
+        fields = [
+            "id",
+            "name",
+            "gstin",
+            "category",
+            "owner",
         ]
         read_only_fields = ["owner"]

@@ -43,6 +43,15 @@ class EmailUser(PrimaryUUIDTimeStampedModel, AbstractUser):
             "access": str(refresh.access_token),
         }
 
+    @property
+    def owners_business(self):
+        business = "None" 
+
+        if self.employer:
+            return self.employer.business
+        
+        return business
+
     def __str__(self):
         return f"{self.email}"
 

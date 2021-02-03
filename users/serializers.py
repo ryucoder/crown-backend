@@ -2,6 +2,8 @@ from rest_framework import serializers
 
 from users.models import EmailUser
 
+from businesses.serializers import BusinessOnlySerializer
+
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -31,6 +33,7 @@ class LoginSerializer(serializers.Serializer):
 
 
 class EmailUserSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = EmailUser
         fields = [
@@ -43,4 +46,32 @@ class EmailUserSerializer(serializers.ModelSerializer):
             "is_email_verified",
             "is_mobile_verified",
             "tokens",
+        ]
+
+
+class EmailUserWithBusinessSerializer(serializers.ModelSerializer):
+
+    def __init__(self, *args, **kwargs):
+        super(EmailUserWithBusinessSerializer, self).__init__(*args, **kwargs)
+
+        if self.instance is not None: 
+            if self.instance.user_type == "owner":
+                self.fields["business"] = BusinessOnlySerializer()
+
+            if self.instance.user_type == "employee":
+                self.fields["owners_business"] = BusinessOnlySerializer(instance=self.instance.employer.business)
+
+    class Meta:
+        model = EmailUser
+        fields = [
+            "id",
+            "first_name",
+            "last_name",
+            "email",
+            "mobile",
+            "user_type",
+            "is_email_verified",
+            "is_mobile_verified",
+            "tokens",
+            "business",
         ]

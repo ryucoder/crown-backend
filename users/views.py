@@ -58,7 +58,7 @@ class EmailUserViewset(RetrieveModelMixin, viewsets.GenericViewSet):
 
         user = serializer.validated_data["user"]
 
-        serializer = serializers.EmailUserSerializer(instance=user)
+        serializer = serializers.EmailUserWithBusinessSerializer(instance=user)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 

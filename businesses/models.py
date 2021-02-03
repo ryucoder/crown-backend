@@ -31,7 +31,7 @@ class Business(PrimaryUUIDTimeStampedModel):
 class BusinessEmployee(PrimaryUUIDTimeStampedModel):
 
     business = models.ForeignKey(
-        "users.EmailUser", related_name="employees", on_delete=models.CASCADE,
+        "businesses.Business", related_name="employees", on_delete=models.CASCADE,
     )
     employee = models.OneToOneField(
         "users.EmailUser", related_name="employer", on_delete=models.CASCADE,
