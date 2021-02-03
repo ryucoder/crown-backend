@@ -23,11 +23,13 @@ from core.views import StateViewset, OrderOptionViewset
 
 from businesses.views import BusinessViewset
 
+from users.views import EmailUserViewset
 
 default_router = DefaultRouter()
-default_router.register(r"states", StateViewset, basename="states")
-default_router.register(r"order-options", OrderOptionViewset, basename="order-option")
-default_router.register(r"businesses", BusinessViewset, basename="businesses")
+default_router.register(r"api/states", StateViewset, basename="states")
+default_router.register(r"api/order-options", OrderOptionViewset, basename="order-option")
+default_router.register(r"api/businesses", BusinessViewset, basename="businesses")
+default_router.register(r"api/users", EmailUserViewset, basename="users")
 
 
 urlpatterns = [

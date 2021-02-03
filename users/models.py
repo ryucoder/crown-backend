@@ -16,7 +16,6 @@ class EmailUser(PrimaryUUIDTimeStampedModel, AbstractUser):
     last_name = models.CharField(max_length=255)
 
     username = None
-    email = models.EmailField("Email ID", unique=True)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
@@ -27,10 +26,13 @@ class EmailUser(PrimaryUUIDTimeStampedModel, AbstractUser):
         max_length=8, choices=USER_TYPE_CHOICES, default="employee"
     )
 
+    email = models.EmailField("Email ID", unique=True)
     is_email_verified = models.BooleanField(default=False)
+    email_verified_time = models.DateTimeField(null=True, blank=True)
+
     mobile = models.BigIntegerField(default=0)
     is_mobile_verified = models.BooleanField(default=False)
-    mobile_verified_time = models.DateTimeField(default=timezone.now)
+    mobile_verified_time = models.DateTimeField(null=True, blank=True)
 
     @property
     def tokens(self):
@@ -61,6 +63,8 @@ class PasswordToken(PrimaryUUIDTimeStampedModel):
         max_length=6, choices=PASSWORD_CATEGORY_CHOICES, default="signup"
     )
 
+    verified_time = models.DateTimeField(null=True, blank=True)
+    
     def __str__(self):
         return f"{self.id}"
 
@@ -78,6 +82,7 @@ class MobileToken(PrimaryUUIDTimeStampedModel):
     token = models.IntegerField()
     expiry = models.DateTimeField()
     is_used = models.BooleanField(default=False)
+    verified_time = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"MobileToken - {self.id}"
