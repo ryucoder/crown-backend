@@ -71,6 +71,9 @@ class PasswordToken(PrimaryUUIDTimeStampedModel):
 
 
 class MobileToken(PrimaryUUIDTimeStampedModel):
+    email_user = models.ForeignKey(
+        "users.EmailUser", related_name="mobile_tokens", on_delete=models.CASCADE,
+    )
     mobile = models.BigIntegerField()
     token = models.IntegerField()
     expiry = models.DateTimeField()
