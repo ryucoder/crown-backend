@@ -3,7 +3,7 @@ login - endpoint ready, frontend pending
 logout - Only in frontend
 signup - Dental Lab - endpoint ready, email sent  
 confirm email - endpoint ready, 
-request reset password
+request reset password - endpoint ready, 
 reset password
 confirm mobile 
 

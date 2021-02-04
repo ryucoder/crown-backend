@@ -33,7 +33,6 @@ class CurrentPagePagination(pagination.PageNumberPagination):
 
 
 class EmailUtil:
-
     @staticmethod
     def send_signup_email(instance, verification_token):
 
@@ -48,7 +47,7 @@ class EmailUtil:
         )
 
         message = Mail(
-            from_email= settings.DEFAULT_FROM_EMAIL,
+            from_email=settings.DEFAULT_FROM_EMAIL,
             to_emails=instance.email,
         )
 
@@ -79,7 +78,7 @@ class EmailUtil:
         )
 
         message = Mail(
-            from_email= settings.DEFAULT_FROM_EMAIL,
+            from_email=settings.DEFAULT_FROM_EMAIL,
             to_emails=instance.email,
         )
 
@@ -98,7 +97,6 @@ class EmailUtil:
 
 
 class TimeUtil:
-
     @staticmethod
     def get_minutes_from_now(MINUTES):
         return timezone.now() + timedelta(minutes=MINUTES)

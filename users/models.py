@@ -74,7 +74,7 @@ class PasswordToken(PrimaryUUIDTimeStampedModel):
         max_length=6, choices=PASSWORD_CATEGORY_CHOICES, default="signup"
     )
 
-    verified_time = models.DateTimeField(null=True, blank=True)
+    used_time = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.id}"
@@ -95,7 +95,7 @@ class MobileToken(PrimaryUUIDTimeStampedModel):
     token = models.IntegerField()
     expiry = models.DateTimeField()
     is_used = models.BooleanField(default=False)
-    verified_time = models.DateTimeField(null=True, blank=True)
+    used_time = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"MobileToken - {self.id}"

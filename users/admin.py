@@ -32,7 +32,7 @@ class MobileTokenAdmin(admin.ModelAdmin):
         "expiry",
         "is_expired",
         "is_used",
-        "verified_time",
+        "used_time",
         "created_at",
         "modified_at",
     ]
@@ -57,7 +57,7 @@ class PasswordTokenAdmin(admin.ModelAdmin):
         "is_used",
         "is_expired",
         "expiry",
-        "verified_time",
+        "used_time",
         "created_at",
         "modified_at",
     ]
@@ -70,7 +70,7 @@ class PasswordTokenAdmin(admin.ModelAdmin):
         #     "is_used",
         #     "is_expired",
         #     "expiry",
-        "verified_time",
+        "used_time",
         #     "created_at",
         #     "modified_at",
     ]

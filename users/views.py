@@ -1,5 +1,3 @@
-from django.utils import timezone
-
 from rest_framework.mixins import RetrieveModelMixin
 from rest_framework import status, viewsets
 from rest_framework.response import Response
@@ -92,7 +90,7 @@ class EmailUserViewset(RetrieveModelMixin, viewsets.GenericViewSet):
         email_user.save()
 
         token_object.is_used = True
-        token_object.verified_time = timezone.now()
+        token_object.used_time = TimeUtil.get_minutes_from_now(0)
         token_object.save()
 
         return Response({"message": "success"}, status=status.HTTP_201_CREATED)
@@ -124,25 +122,26 @@ class EmailUserViewset(RetrieveModelMixin, viewsets.GenericViewSet):
 
         return Response(data=data, status=status.HTTP_200_OK)
 
-    # @action(detail=False, methods=["post"])
-    # def reset_password(self, request, *args, **kwargs):
+    @action(detail=False, methods=["post"])
+    def reset_password(self, request, *args, **kwargs):
 
-    #     serializer = ResetPasswordSerializer(data=request.data)
-    #     serializer.is_valid(raise_exception=True)
+        serializer = serializers.ResetPasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-    #     email = serializer.validated_data["email"]
-    #     password = serializer.validated_data["password_one"]
-    #     token = serializer.validated_data["token"]
+        email = serializer.validated_data["email"]
+        password = serializer.validated_data["password_one"]
+        token = serializer.validated_data["token"]
 
-    #     token.is_used = True
-    #     token.save()
+        token.is_used = True
+        token.used_time = TimeUtil.get_minutes_from_now(0)
+        token.save()
 
-    #     email.email_user.set_password(password)
-    #     email.email_user.save()
+        email.email_user.set_password(password)
+        email.email_user.save()
 
-    #     data = {"message": "passsword_reset_successfully"}
+        data = {"message": "success"}
 
-    #     return Response(data=data, status=status.HTTP_200_OK)
+        return Response(data=data, status=status.HTTP_200_OK)
 
     # @action(detail=False, methods=["post"])
     # def request_mobile_token(self, request, *args, **kwargs):

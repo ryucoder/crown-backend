@@ -302,3 +302,70 @@ class RequestPasswordResetSerializer(serializers.Serializer):
                 raise serializers.ValidationError(message)
 
         return data
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField(
+        error_messages=CUSTOM_ERROR_MESSAGES["EmailField"],
+    )
+    token = serializers.UUIDField(
+        error_messages=CUSTOM_ERROR_MESSAGES["UUIDField"],
+    )
+    password_one = serializers.CharField(
+        min_length=9,
+        max_length=255,
+        error_messages=CUSTOM_ERROR_MESSAGES["CharField"],
+    )
+    password_two = serializers.CharField(
+        min_length=9,
+        max_length=255,
+        error_messages=CUSTOM_ERROR_MESSAGES["CharField"],
+    )
+
+    def validate_email(self, email):
+        email = email.strip().lower()
+        token = self.initial_data["token"].strip()
+
+        # TODO: same sql is being run twice, need a fix for this.
+        queryset = PasswordToken.objects.filter(email_user__email=email, token=token).order_by(
+            "-created_at"
+        )
+
+        if not queryset.exists():
+            message = "server_absent"
+            raise serializers.ValidationError(message)
+
+        return queryset.first()
+
+    def validate_token(self, token):
+
+        email = self.initial_data["email"].strip().lower()
+
+        # TODO: same sql is being run twice, need a fix for this.
+        queryset = PasswordToken.objects.filter(email_user__email=email, token=token).order_by("-created_at")
+
+        if not queryset.exists():
+            message = "server_absent"
+            raise serializers.ValidationError(message)
+
+        token_object = queryset.first()
+
+        if token_object.is_used:
+            message = "server_used"
+            raise serializers.ValidationError(message)
+
+        if token_object.expiry < timezone.now():
+            message = "server_expired"
+            raise serializers.ValidationError(message)
+
+        return token_object
+
+    def validate(self, data):
+        password_one = data["password_one"]
+        password_two = data["password_two"]
+
+        if password_one != password_two:
+            message = "server_passwords_not_match"
+            raise serializers.ValidationError(message)
+
+        return data
