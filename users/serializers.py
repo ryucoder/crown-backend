@@ -327,9 +327,9 @@ class ResetPasswordSerializer(serializers.Serializer):
         token = self.initial_data["token"].strip()
 
         # TODO: same sql is being run twice, need a fix for this.
-        queryset = PasswordToken.objects.filter(email_user__email=email, token=token).order_by(
-            "-created_at"
-        )
+        queryset = PasswordToken.objects.filter(
+            email_user__email=email, token=token
+        ).order_by("-created_at")
 
         if not queryset.exists():
             message = "server_absent"
@@ -342,7 +342,9 @@ class ResetPasswordSerializer(serializers.Serializer):
         email = self.initial_data["email"].strip().lower()
 
         # TODO: same sql is being run twice, need a fix for this.
-        queryset = PasswordToken.objects.filter(email_user__email=email, token=token).order_by("-created_at")
+        queryset = PasswordToken.objects.filter(
+            email_user__email=email, token=token
+        ).order_by("-created_at")
 
         if not queryset.exists():
             message = "server_absent"

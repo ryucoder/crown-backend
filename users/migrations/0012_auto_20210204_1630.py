@@ -6,18 +6,18 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0011_auto_20210203_1413'),
+        ("users", "0011_auto_20210203_1413"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='mobiletoken',
-            old_name='verified_time',
-            new_name='used_time',
+            model_name="mobiletoken",
+            old_name="verified_time",
+            new_name="used_time",
         ),
         migrations.RenameField(
-            model_name='passwordtoken',
-            old_name='verified_time',
-            new_name='used_time',
+            model_name="passwordtoken",
+            old_name="verified_time",
+            new_name="used_time",
         ),
     ]
