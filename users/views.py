@@ -5,7 +5,7 @@ from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
-from core.utils import TimeUtil
+from core.utils import TimeUtil, EmailUtil
 
 from users import serializers
 from users.models import EmailUser, PasswordToken
@@ -117,8 +117,8 @@ class EmailUserViewset(RetrieveModelMixin, viewsets.GenericViewSet):
 
         verification_token.save()
 
-        # send email to user via celery task
-        # EmailUtil.send_request_password_reset_email(email_user, verification_token)
+        # NOTE: DO NOT SEND EMAIL VIA CELERY TASK
+        EmailUtil.send_request_password_reset_email(email_user, verification_token)
 
         data = {"message": "token_generated"}
 
