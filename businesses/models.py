@@ -67,6 +67,8 @@ class BusinessContact(PrimaryUUIDTimeStampedModel):
         max_length=255, choices=contact_type_choices, default="mobile"
     )
 
+    is_verified = models.BooleanField(default=False)
+
     def __str__(self):
         return f"{self.business} - {self.contact}"
 

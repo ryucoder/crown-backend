@@ -100,6 +100,7 @@ class BusinessContactAdmin(admin.ModelAdmin):
         "business",
         "contact",
         "contact_type",
+        "is_verified",
         "created_at",
         "modified_at",
     ]
