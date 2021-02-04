@@ -33,6 +33,7 @@ class CurrentPagePagination(pagination.PageNumberPagination):
 
 
 class EmailUtil:
+
     @staticmethod
     def send_signup_email(instance, verification_token):
 
@@ -47,7 +48,7 @@ class EmailUtil:
         )
 
         message = Mail(
-            from_email="rockstar.ryucoder@gmail.com",
+            from_email= settings.DEFAULT_FROM_EMAIL,
             to_emails=instance.email,
         )
 
@@ -78,14 +79,14 @@ class EmailUtil:
         )
 
         message = Mail(
-            from_email="info@packfect.com",
+            from_email= settings.DEFAULT_FROM_EMAIL,
             to_emails=instance.email,
         )
 
         message.dynamic_template_data = {"verify_url": verify_url}
 
         # NOTE: DYNAMIC TEMPLATE ID OF THE TEMPLATE IN THE RESET PASSWORD email
-        message.template_id = settings.SENDGRID_TEMPLATE_ID_LABORATORY_SIGNUP_EMAIL
+        message.template_id = settings.SENDGRID_TEMPLATE_ID_REQUEST_PASSWORD_RESET_EMAIL
 
         try:
             sendgrid_client = SendGridAPIClient(settings.SENDGRID_API_KEY)
@@ -97,6 +98,7 @@ class EmailUtil:
 
 
 class TimeUtil:
+
     @staticmethod
     def get_minutes_from_now(MINUTES):
         return timezone.now() + timedelta(minutes=MINUTES)
