@@ -62,6 +62,19 @@ class PasswordTokenAdmin(admin.ModelAdmin):
         "modified_at",
     ]
 
+    readonly_fields = [
+        #     "id",
+        #     "email_user",
+        "token",
+        "category",
+        #     "is_used",
+        #     "is_expired",
+        #     "expiry",
+        "verified_time",
+        #     "created_at",
+        #     "modified_at",
+    ]
+
     class Meta:
         model = PasswordToken
 

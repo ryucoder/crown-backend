@@ -17,7 +17,16 @@ class OrderOptionSerializer(serializers.ModelSerializer):
         fields = ["id", "option"]
 
 
-class ServerErrorSerializer(serializers.ModelSerializer):
+class ServerErrorSerializer(serializers.Serializer):
+    def __init__(self, *args, **kwargs):
+        super(ServerErrorSerializer, self).__init__(*args, **kwargs)
+
+        for item in self.fields:
+            for error_key in self.fields[item].error_messages:
+                self.fields[item].error_messages[error_key] = "server_" + error_key
+
+
+class ServerErrorModelSerializer(serializers.ModelSerializer):
     """
     TODO: Need to fix and use everywhere
     Not working for ModelSerializer
@@ -26,7 +35,7 @@ class ServerErrorSerializer(serializers.ModelSerializer):
     """
 
     def __init__(self, *args, **kwargs):
-        super(ServerErrorSerializer, self).__init__(*args, **kwargs)
+        super(ServerErrorModelSerializer, self).__init__(*args, **kwargs)
 
         for item in self.fields:
             for error_key in self.fields[item].error_messages:

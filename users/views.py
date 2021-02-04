@@ -1,11 +1,12 @@
-from users import serializers
-from users.models import EmailUser
+from django.utils import timezone
 
 from rest_framework.mixins import RetrieveModelMixin
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
+from users import serializers
+from users.models import EmailUser
 
 # from rest_framework_simplejwt.authentication import (
 #     JWTAuthentication,
@@ -42,8 +43,8 @@ class EmailUserViewset(RetrieveModelMixin, viewsets.GenericViewSet):
         # if self.action == "reset_password":
         #     return ResetPasswordSerializer
 
-        # if self.action == "request_mobile_token":
-        #     return MobileTokenSerializer
+        if self.action == "laboratory_verify_signup":
+            return serializers.LaboratoryVerifySignUpSerializer
 
         # if self.action == "retrieve":
         #     return EmailUserDetailSerializer
@@ -74,22 +75,23 @@ class EmailUserViewset(RetrieveModelMixin, viewsets.GenericViewSet):
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    # @action(detail=False, methods=["put"])
-    # def client_verify_signup(self, request, *args, **kwargs):
+    @action(detail=False, methods=["put"])
+    def laboratory_verify_signup(self, request, *args, **kwargs):
 
-    #     serializer = ClientVerifySignUpSerializer(data=request.data)
-    #     serializer.is_valid(raise_exception=True)
+        serializer = serializers.LaboratoryVerifySignUpSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-    #     email_user = serializer.validated_data["email"]
-    #     token_object = serializer.validated_data["token"]
+        email_user = serializer.validated_data["email"]
+        token_object = serializer.validated_data["token"]
 
-    #     email_user.is_email_verified = True
-    #     email_user.save()
+        email_user.is_email_verified = True
+        email_user.save()
 
-    #     token_object.is_used = True
-    #     token_object.save()
+        token_object.is_used = True
+        token_object.verified_time = timezone.now()
+        token_object.save()
 
-    #     return Response({"message": "success"}, status=status.HTTP_201_CREATED)
+        return Response({"message": "success"}, status=status.HTTP_201_CREATED)
 
     # @action(detail=False, methods=["post"])
     # def request_password_reset_token(self, request, *args, **kwargs):

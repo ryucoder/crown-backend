@@ -198,3 +198,65 @@ class LaboratorySignUpSerializer(serializers.ModelSerializer):
         EmailUtil.send_signup_email(instance, verification_token)
 
         return instance
+
+
+class LaboratoryVerifySignUpSerializer(serializers.Serializer):
+    email = serializers.EmailField(
+        error_messages=CUSTOM_ERROR_MESSAGES["EmailField"],
+    )
+    token = serializers.UUIDField(
+        error_messages=CUSTOM_ERROR_MESSAGES["UUIDField"],
+    )
+
+    def validate_email(self, email):
+        email = email.strip().lower()
+
+        queryset = EmailUser.objects.filter(email=email)
+
+        if not queryset.exists():
+            message = "server_absent"
+            raise serializers.ValidationError(message)
+
+        return queryset.first()
+
+    def validate_token(self, token):
+
+        email = self.initial_data["email"].strip().lower()
+
+        queryset = PasswordToken.objects.filter(
+            token=token, category="signup"
+        ).order_by("-created_at")
+
+        if not queryset.exists():
+            # NOTE: message should be server_absent, but for this endpoint server_invalid is chosen
+            message = "server_invalid"
+            raise serializers.ValidationError(message)
+
+        token_object = queryset.first()
+
+        if token_object.is_used:
+            message = "server_used"
+            raise serializers.ValidationError(message)
+
+        if token_object.expiry < timezone.now():
+            message = "server_expired"
+            raise serializers.ValidationError(message)
+
+        return token_object
+
+    def validate(self, data):
+        email_user = data["email"]
+        token_object = data["token"]
+
+        queryset = PasswordToken.objects.filter(
+            email_user_id=email_user.id, token=token_object.token, category="signup"
+        ).order_by("-created_at")
+
+        if not queryset.exists():
+            message = "server_email_token_mismatch"
+            raise serializers.ValidationError(message)
+
+        return data
+
+    class Meta:
+        fields = ["email", "token"]

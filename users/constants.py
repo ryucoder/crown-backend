@@ -32,4 +32,9 @@ CUSTOM_ERROR_MESSAGES = {
         "null": "server_null",
         "required": "server_required",
     },
+    "UUIDField": {
+        "required": "server_required",
+        "null": "server_null",
+        "invalid": "server_invalid",
+    },
 }

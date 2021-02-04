@@ -15,11 +15,6 @@ print()
 print("ENVIRONMENT")
 print(ENVIRONMENT)
 print()
-print()
-print("DOMAIN_NAME")
-print(DOMAIN_NAME)
-print()
-print()
 
 
 sentry_sdk.init(
