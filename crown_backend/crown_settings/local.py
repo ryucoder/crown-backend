@@ -35,3 +35,8 @@ DATABASES = {
         "NAME": os.path.join(BASE_DIR, "crown-local.sqlite3"),
     }
 }
+
+
+SENDGRID_API_KEY = env("SENDGRID_API_KEY")
+
+DOMAIN_NAME = env("DOMAIN_NAME")

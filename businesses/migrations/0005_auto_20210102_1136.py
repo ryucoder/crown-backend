@@ -15,7 +15,9 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RenameField(
-            model_name="business", old_name="user", new_name="owner",
+            model_name="business",
+            old_name="user",
+            new_name="owner",
         ),
         migrations.CreateModel(
             name="BusinessEmployee",

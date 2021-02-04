@@ -10,9 +10,21 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(model_name="emailuseraddress", name="state",),
-        migrations.RemoveField(model_name="emailuseraddress", name="user",),
-        migrations.DeleteModel(name="BankAccount",),
-        migrations.DeleteModel(name="EmailUserAddress",),
-        migrations.DeleteModel(name="State",),
+        migrations.RemoveField(
+            model_name="emailuseraddress",
+            name="state",
+        ),
+        migrations.RemoveField(
+            model_name="emailuseraddress",
+            name="user",
+        ),
+        migrations.DeleteModel(
+            name="BankAccount",
+        ),
+        migrations.DeleteModel(
+            name="EmailUserAddress",
+        ),
+        migrations.DeleteModel(
+            name="State",
+        ),
     ]

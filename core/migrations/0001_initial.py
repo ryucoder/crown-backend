@@ -28,6 +28,9 @@ class Migration(migrations.Migration):
                 ("name", models.CharField(max_length=255)),
                 ("gst_code", models.IntegerField()),
             ],
-            options={"verbose_name": "State", "verbose_name_plural": "States",},
+            options={
+                "verbose_name": "State",
+                "verbose_name_plural": "States",
+            },
         ),
     ]

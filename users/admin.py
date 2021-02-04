@@ -105,7 +105,11 @@ class EmailUserAdmin(admin.ModelAdmin):
             "Personal Details",
             {
                 # 'classes': ('collapse',),
-                "fields": ("first_name", "last_name", "mobile",),
+                "fields": (
+                    "first_name",
+                    "last_name",
+                    "mobile",
+                ),
             },
         ),
         (
@@ -121,7 +125,10 @@ class EmailUserAdmin(admin.ModelAdmin):
         ),
         ("Groups", {"fields": ("groups",)}),
         ("Permissions", {"fields": ("user_permissions",)}),
-        ("Account Status", {"fields": ("is_active", "is_staff", "is_superuser")},),
+        (
+            "Account Status",
+            {"fields": ("is_active", "is_staff", "is_superuser")},
+        ),
         ("Dates", {"fields": ("last_login", "date_joined")}),
     ]
 
@@ -134,10 +141,10 @@ class EmailUserAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         """
-            As the password needs to be hashed before it is saved to database,
-            we need to override this method to achieve that.
+        As the password needs to be hashed before it is saved to database,
+        we need to override this method to achieve that.
 
-            If we don't do this, password will be saved in the plain text format.
+        If we don't do this, password will be saved in the plain text format.
         """
 
         # If password is not hashed, hash it.
@@ -155,10 +162,10 @@ class EmailUserAdmin(admin.ModelAdmin):
 
     def _is_password_hashed(self, obj):
         """
-            A separate function is created here,
-            so if you want to support multiple different hashers,
-            you can just add one extra if condition in this function,
-            so that the above code need not be updated at all.
+        A separate function is created here,
+        so if you want to support multiple different hashers,
+        you can just add one extra if condition in this function,
+        so that the above code need not be updated at all.
         """
 
         if obj.password.startswith("pbkdf2_sha256"):

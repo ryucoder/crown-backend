@@ -11,7 +11,8 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RenameModel(
-            old_name="ResetPasswordToken", new_name="PasswordToken",
+            old_name="ResetPasswordToken",
+            new_name="PasswordToken",
         ),
         migrations.AlterModelOptions(
             name="passwordtoken",

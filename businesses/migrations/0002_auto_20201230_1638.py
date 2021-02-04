@@ -89,7 +89,10 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"verbose_name": "Order", "verbose_name_plural": "Orders",},
+            options={
+                "verbose_name": "Order",
+                "verbose_name_plural": "Orders",
+            },
         ),
         migrations.AlterField(
             model_name="businessaddress",

@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0009_mobiletoken'),
+        ("users", "0009_mobiletoken"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='mobiletoken',
-            name='verified_time',
+            model_name="mobiletoken",
+            name="verified_time",
             field=models.DateTimeField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='passwordtoken',
-            name='verified_time',
+            model_name="passwordtoken",
+            name="verified_time",
             field=models.DateTimeField(blank=True, null=True),
         ),
     ]

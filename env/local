@@ -1,5 +1,4 @@
-# SQLITE3
-# ------------------------------------------------------------------------------
 
-DATABASE_ENGINE=django.db.backends.sqlite3
-DATABASE_NAME=packfect-local.sqlite3
+SENDGRID_API_KEY=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
+
+DOMAIN_NAME=http://localhost:4200

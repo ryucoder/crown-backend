@@ -67,7 +67,6 @@ class BusinessSerializer(ServerErrorSerializer):
 
 
 class BusinessOnlySerializer(ServerErrorSerializer):
-
     class Meta:
         model = Business
         fields = [

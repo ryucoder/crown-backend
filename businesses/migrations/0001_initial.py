@@ -53,7 +53,10 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"verbose_name": "Business", "verbose_name_plural": "Businesses",},
+            options={
+                "verbose_name": "Business",
+                "verbose_name_plural": "Businesses",
+            },
         ),
         migrations.CreateModel(
             name="BusinessContact",

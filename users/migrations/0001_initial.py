@@ -133,7 +133,9 @@ class Migration(migrations.Migration):
                 "verbose_name": "Email User",
                 "verbose_name_plural": "Email Users",
             },
-            managers=[("objects", users.managers.UserManager()),],
+            managers=[
+                ("objects", users.managers.UserManager()),
+            ],
         ),
         migrations.CreateModel(
             name="MobileToken",
@@ -176,7 +178,10 @@ class Migration(migrations.Migration):
                 ("name", models.CharField(max_length=255)),
                 ("gst_code", models.IntegerField()),
             ],
-            options={"verbose_name": "State", "verbose_name_plural": "States",},
+            options={
+                "verbose_name": "State",
+                "verbose_name_plural": "States",
+            },
         ),
         migrations.CreateModel(
             name="EmailUserAddress",

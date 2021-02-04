@@ -8,14 +8,16 @@ from businesses.constants import CATEGORY_CHOICES, ORDER_STATUS_CHOICES
 class Business(PrimaryUUIDTimeStampedModel):
     name = models.CharField(max_length=255)
 
-    gstin = models.CharField(max_length=15)
+    gstin = models.CharField(max_length=15, null=True, blank=True)
 
     category = models.CharField(
         max_length=12, choices=CATEGORY_CHOICES, default="laboratory"
     )
 
     owner = models.OneToOneField(
-        "users.EmailUser", related_name="business", on_delete=models.CASCADE,
+        "users.EmailUser",
+        related_name="business",
+        on_delete=models.CASCADE,
     )
 
     is_active = models.BooleanField(default=True)
@@ -31,10 +33,14 @@ class Business(PrimaryUUIDTimeStampedModel):
 class BusinessEmployee(PrimaryUUIDTimeStampedModel):
 
     business = models.ForeignKey(
-        "businesses.Business", related_name="employees", on_delete=models.CASCADE,
+        "businesses.Business",
+        related_name="employees",
+        on_delete=models.CASCADE,
     )
     employee = models.OneToOneField(
-        "users.EmailUser", related_name="employer", on_delete=models.CASCADE,
+        "users.EmailUser",
+        related_name="employer",
+        on_delete=models.CASCADE,
     )
 
     def __str__(self):

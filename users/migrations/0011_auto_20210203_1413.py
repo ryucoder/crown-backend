@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0010_auto_20210203_1409'),
+        ("users", "0010_auto_20210203_1409"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='emailuser',
-            name='email_verified_time',
+            model_name="emailuser",
+            name="email_verified_time",
             field=models.DateTimeField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='emailuser',
-            name='mobile_verified_time',
+            model_name="emailuser",
+            name="mobile_verified_time",
             field=models.DateTimeField(blank=True, null=True),
         ),
     ]

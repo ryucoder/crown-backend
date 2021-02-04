@@ -45,11 +45,11 @@ class EmailUser(PrimaryUUIDTimeStampedModel, AbstractUser):
 
     @property
     def owners_business(self):
-        business = "None" 
+        business = "None"
 
         if self.employer:
             return self.employer.business
-        
+
         return business
 
     def __str__(self):
@@ -63,7 +63,9 @@ class EmailUser(PrimaryUUIDTimeStampedModel, AbstractUser):
 class PasswordToken(PrimaryUUIDTimeStampedModel):
 
     email_user = models.ForeignKey(
-        "users.EmailUser", related_name="password_tokens", on_delete=models.CASCADE,
+        "users.EmailUser",
+        related_name="password_tokens",
+        on_delete=models.CASCADE,
     )
     token = models.UUIDField()
     expiry = models.DateTimeField()
@@ -73,7 +75,7 @@ class PasswordToken(PrimaryUUIDTimeStampedModel):
     )
 
     verified_time = models.DateTimeField(null=True, blank=True)
-    
+
     def __str__(self):
         return f"{self.id}"
 
@@ -85,7 +87,9 @@ class PasswordToken(PrimaryUUIDTimeStampedModel):
 
 class MobileToken(PrimaryUUIDTimeStampedModel):
     email_user = models.ForeignKey(
-        "users.EmailUser", related_name="mobile_tokens", on_delete=models.CASCADE,
+        "users.EmailUser",
+        related_name="mobile_tokens",
+        on_delete=models.CASCADE,
     )
     mobile = models.BigIntegerField()
     token = models.IntegerField()

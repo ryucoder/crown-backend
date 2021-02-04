@@ -27,7 +27,9 @@ from users.views import EmailUserViewset
 
 default_router = DefaultRouter()
 default_router.register(r"api/states", StateViewset, basename="states")
-default_router.register(r"api/order-options", OrderOptionViewset, basename="order-option")
+default_router.register(
+    r"api/order-options", OrderOptionViewset, basename="order-option"
+)
 default_router.register(r"api/businesses", BusinessViewset, basename="businesses")
 default_router.register(r"api/users", EmailUserViewset, basename="users")
 
@@ -42,4 +44,6 @@ urlpatterns += default_router.urls
 if settings.DEBUG:
     import debug_toolbar
 
-    urlpatterns = [path("__debug__/", include(debug_toolbar.urls)),] + urlpatterns
+    urlpatterns = [
+        path("__debug__/", include(debug_toolbar.urls)),
+    ] + urlpatterns

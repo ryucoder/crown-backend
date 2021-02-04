@@ -1,3 +1,5 @@
+from pprint import pprint
+
 from rest_framework import serializers
 
 from core.models import State, OrderOption
@@ -16,6 +18,13 @@ class OrderOptionSerializer(serializers.ModelSerializer):
 
 
 class ServerErrorSerializer(serializers.ModelSerializer):
+    """
+    TODO: Need to fix and use everywhere
+    Not working for ModelSerializer
+    When instantiated, errors get updated.
+    But when the errors are returned to user, they are the default error messages.
+    """
+
     def __init__(self, *args, **kwargs):
         super(ServerErrorSerializer, self).__init__(*args, **kwargs)
 

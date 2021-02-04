@@ -13,10 +13,10 @@ from rest_framework.decorators import action
 # )
 
 
-# login 
-# signup - Dental Lab  
-# confirm email 
-# confirm mobile 
+# login
+# signup - Dental Lab
+# confirm email
+# confirm mobile
 # request reset password
 # reset password
 
@@ -33,8 +33,8 @@ class EmailUserViewset(RetrieveModelMixin, viewsets.GenericViewSet):
         if self.action == "login":
             return serializers.LoginSerializer
 
-        # if self.action == "client_signup_view":
-        #     return ClientSignUpSerializer
+        if self.action == "laboratory_signup":
+            return serializers.LaboratorySignUpSerializer
 
         # if self.action == "request_reset_password":
         #     return RequestResetPasswordSerializer
@@ -62,17 +62,17 @@ class EmailUserViewset(RetrieveModelMixin, viewsets.GenericViewSet):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    # @action(detail=False, methods=["post"])
-    # def client_signup(self, request, *args, **kwargs):
+    @action(detail=False, methods=["post"])
+    def laboratory_signup(self, request, *args, **kwargs):
 
-    #     serializer = ClientSignUpSerializer(data=request.data)
-    #     serializer.is_valid(raise_exception=True)
+        serializer = serializers.LaboratorySignUpSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-    #     instance = serializer.save()
+        instance = serializer.save()
 
-    #     serializer = EmailUserSerializer(instance=instance)
+        serializer = serializers.EmailUserWithBusinessSerializer(instance=instance)
 
-    #     return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     # @action(detail=False, methods=["put"])
     # def client_verify_signup(self, request, *args, **kwargs):
@@ -145,4 +145,3 @@ class EmailUserViewset(RetrieveModelMixin, viewsets.GenericViewSet):
     #     data = {"message": "mobile_token_generated"}
 
     #     return Response(data=data, status=status.HTTP_200_OK)
-
