@@ -5,8 +5,12 @@ from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
+from core.utils import TimeUtil
+
 from users import serializers
-from users.models import EmailUser
+from users.models import EmailUser, PasswordToken
+from users.utils import PasswordUtil
+from users.constants import RESET_PASSWORD_TOKEN_EXPIRY_MINUTES
 
 # from rest_framework_simplejwt.authentication import (
 #     JWTAuthentication,
@@ -37,8 +41,8 @@ class EmailUserViewset(RetrieveModelMixin, viewsets.GenericViewSet):
         if self.action == "laboratory_signup":
             return serializers.LaboratorySignUpSerializer
 
-        # if self.action == "request_reset_password":
-        #     return RequestResetPasswordSerializer
+        if self.action == "request_password_reset_token":
+            return serializers.RequestPasswordResetSerializer
 
         # if self.action == "reset_password":
         #     return ResetPasswordSerializer
@@ -93,28 +97,32 @@ class EmailUserViewset(RetrieveModelMixin, viewsets.GenericViewSet):
 
         return Response({"message": "success"}, status=status.HTTP_201_CREATED)
 
-    # @action(detail=False, methods=["post"])
-    # def request_password_reset_token(self, request, *args, **kwargs):
+    @action(detail=False, methods=["post"])
+    def request_password_reset_token(self, request, *args, **kwargs):
 
-    #     serializer = RequestResetPasswordSerializer(data=request.data)
-    #     serializer.is_valid(raise_exception=True)
+        serializer = serializers.RequestPasswordResetSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-    #     email_user = serializer.validated_data["email"]
+        email_user = serializer.validated_data["email"]
 
-    #     verification_token = ResetPasswordToken()
-    #     verification_token.email_user = email_user
-    #     verification_token.token = EmailUserUtil.get_password_reset_token(email_user)
-    #     verification_token.expiry = timezone.now() + RESET_PASSWORD_TOKEN_EXPIRY_TIME
-    #     verification_token.is_token_used = False
+        verification_token = PasswordToken()
+        verification_token.email_user = email_user
+        verification_token.token = PasswordUtil.get_unique_password_token(email_user)
+        verification_token.expiry = TimeUtil.get_minutes_from_now(
+            RESET_PASSWORD_TOKEN_EXPIRY_MINUTES
+        )
 
-    #     verification_token.save()
+        verification_token.is_token_used = False
+        verification_token.category = "reset"
 
-    #     # send email to user via celery task
-    #     EmailUtil.send_request_password_reset_email(email_user, verification_token)
+        verification_token.save()
 
-    #     data = {"message": "token_generated"}
+        # send email to user via celery task
+        # EmailUtil.send_request_password_reset_email(email_user, verification_token)
 
-    #     return Response(data=data, status=status.HTTP_200_OK)
+        data = {"message": "token_generated"}
+
+        return Response(data=data, status=status.HTTP_200_OK)
 
     # @action(detail=False, methods=["post"])
     # def reset_password(self, request, *args, **kwargs):

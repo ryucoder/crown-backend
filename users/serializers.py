@@ -10,7 +10,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from core.serializers import ServerErrorSerializer
-from core.utils import EmailUtil
+from core.utils import EmailUtil, TimeUtil
 
 from users.models import EmailUser, PasswordToken
 from users.constants import SIGNUP_TOKEN_EXPIRY_MINUTES, CUSTOM_ERROR_MESSAGES
@@ -179,8 +179,8 @@ class LaboratorySignUpSerializer(serializers.ModelSerializer):
         verification_token.token = uuid.uuid4()
         verification_token.category = "signup"
         verification_token.is_used = False
-        verification_token.expiry = timezone.now() + timedelta(
-            minutes=SIGNUP_TOKEN_EXPIRY_MINUTES
+        verification_token.expiry = TimeUtil.get_minutes_from_now(
+            SIGNUP_TOKEN_EXPIRY_MINUTES
         )
 
         # Business
@@ -260,3 +260,45 @@ class LaboratoryVerifySignUpSerializer(serializers.Serializer):
 
     class Meta:
         fields = ["email", "token"]
+
+
+class RequestPasswordResetSerializer(serializers.Serializer):
+    email = serializers.EmailField(
+        error_messages=CUSTOM_ERROR_MESSAGES["EmailField"],
+    )
+
+    def validate_email(self, email):
+        email = email.strip().lower()
+
+        queryset = EmailUser.objects.filter(email=email)
+
+        if not queryset.exists():
+            message = "server_absent"
+            raise serializers.ValidationError(message)
+
+        return queryset.first()
+
+    def validate(self, data):
+
+        is_initial = False
+
+        email_user = data["email"]
+
+        user_tokens = PasswordToken.objects.order_by("-created_at").filter(
+            email_user=email_user, category="reset"
+        )
+
+        if user_tokens.exists():
+            latest_token = user_tokens.first()
+
+        else:
+            is_initial = True
+
+        if is_initial == False:
+            if (latest_token.is_used == False) and (
+                latest_token.expiry > timezone.now()
+            ):
+                message = "latest_token_unused_and_not_expired"
+                raise serializers.ValidationError(message)
+
+        return data

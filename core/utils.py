@@ -1,6 +1,8 @@
 from pprint import pprint
+from datetime import timedelta
 
 from django.conf import settings
+from django.utils import timezone
 
 from django.core.paginator import Paginator
 from django.core.paginator import InvalidPage
@@ -92,3 +94,9 @@ class EmailUtil:
         except Exception as error:
             # log to sentry
             capture_exception(error)
+
+
+class TimeUtil:
+    @staticmethod
+    def get_minutes_from_now(MINUTES):
+        return timezone.now() + timedelta(minutes=MINUTES)
