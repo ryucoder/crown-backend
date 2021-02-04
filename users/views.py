@@ -42,8 +42,8 @@ class EmailUserViewset(RetrieveModelMixin, viewsets.GenericViewSet):
         if self.action == "request_password_reset_token":
             return serializers.RequestPasswordResetSerializer
 
-        # if self.action == "reset_password":
-        #     return ResetPasswordSerializer
+        if self.action == "reset_password":
+            return serializers.ResetPasswordSerializer
 
         if self.action == "laboratory_verify_signup":
             return serializers.LaboratoryVerifySignUpSerializer
