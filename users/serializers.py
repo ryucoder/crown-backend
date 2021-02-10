@@ -13,7 +13,7 @@ from core.serializers import ServerErrorSerializer
 from core.utils import EmailUtil, TimeUtil
 
 from users.models import EmailUser, PasswordToken
-from users.constants import SIGNUP_TOKEN_EXPIRY_MINUTES, CUSTOM_ERROR_MESSAGES
+from users.constants import SIGNUP_TOKEN_EXPIRY_MINUTES, CUSTOM_ERROR_MESSAGES, DEFAULT_DENTIST_PASSWORD
 
 from businesses.models import Business
 from businesses.serializers import BusinessOnlySerializer
@@ -65,7 +65,7 @@ class EmailUserSerializer(serializers.ModelSerializer):
 class EmailUserWithBusinessSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         super(EmailUserWithBusinessSerializer, self).__init__(*args, **kwargs)
-
+        
         if self.instance is not None:
             if self.instance.user_type == "owner":
                 self.fields["business"] = BusinessOnlySerializer()
@@ -371,3 +371,85 @@ class ResetPasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError(message)
 
         return data
+
+
+class CreateDentistSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(
+        max_length=255,
+        required=True,
+        error_messages=CUSTOM_ERROR_MESSAGES["CharField"],
+    )
+    last_name = serializers.CharField(
+        max_length=255,
+        required=True,
+        error_messages=CUSTOM_ERROR_MESSAGES["CharField"],
+    )
+    company_name = serializers.CharField(
+        max_length=255,
+        write_only=True,
+        error_messages=CUSTOM_ERROR_MESSAGES["CharField"],
+    )
+
+    email = serializers.EmailField(
+        max_length=255,
+        error_messages=CUSTOM_ERROR_MESSAGES["EmailField"],
+        validators=[
+            UniqueValidator(
+                queryset=EmailUser.objects.all(), message="server_exists_already"
+            )
+        ],
+    )
+
+    def validate_email(self, email):
+        email = email.strip().lower()
+        queryset = EmailUser.objects.filter(email__iexact=email)
+
+        if queryset.exists():
+            message = "server_exists_already"
+            raise serializers.ValidationError(message)
+
+        return email
+
+    class Meta:
+        model = EmailUser
+        fields = [
+            "id",
+            "first_name",
+            "last_name",
+            "email",
+            "company_name",
+        ]
+
+    def create(self, validated_data):
+        company_name = validated_data.pop("company_name")
+
+        instance = EmailUser(**validated_data)
+        instance.password = make_password(DEFAULT_DENTIST_PASSWORD)
+        instance.user_type = "owner"
+        instance.is_email_verified = False
+
+        # # EMAIL TOKEN
+        # verification_token = PasswordToken()
+        # verification_token.email_user = instance
+        # verification_token.token = uuid.uuid4()
+        # verification_token.category = "signup"
+        # verification_token.is_used = False
+        # verification_token.expiry = TimeUtil.get_minutes_from_now(
+        #     SIGNUP_TOKEN_EXPIRY_MINUTES
+        # )
+
+        # Business
+        business = Business()
+        business.name = company_name
+        business.owner = instance
+        business.category = "dentist"
+        business.is_active = True
+
+        with transaction.atomic():
+            instance.save()
+            # verification_token.save()
+            business.save()
+
+
+        return instance
+
