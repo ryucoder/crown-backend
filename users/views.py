@@ -154,18 +154,6 @@ class EmailUserViewset(RetrieveModelMixin, viewsets.GenericViewSet):
 
         instance = serializer.save()
 
-        print()
-        print()
-        print("instance")
-        print(instance)
-        print()
-        print("instance.user_type")
-        print(instance.user_type)
-        print()
-        print("instance.business")
-        print(instance.business)
-        print()
-        print()
         serializer = serializers.EmailUserWithBusinessSerializer(instance=instance)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)

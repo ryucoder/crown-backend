@@ -13,7 +13,11 @@ from core.serializers import ServerErrorSerializer
 from core.utils import EmailUtil, TimeUtil
 
 from users.models import EmailUser, PasswordToken
-from users.constants import SIGNUP_TOKEN_EXPIRY_MINUTES, CUSTOM_ERROR_MESSAGES, DEFAULT_DENTIST_PASSWORD
+from users.constants import (
+    SIGNUP_TOKEN_EXPIRY_MINUTES,
+    CUSTOM_ERROR_MESSAGES,
+    DEFAULT_DENTIST_PASSWORD,
+)
 
 from businesses.models import Business
 from businesses.serializers import BusinessOnlySerializer
@@ -65,7 +69,7 @@ class EmailUserSerializer(serializers.ModelSerializer):
 class EmailUserWithBusinessSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         super(EmailUserWithBusinessSerializer, self).__init__(*args, **kwargs)
-        
+
         if self.instance is not None:
             if self.instance.user_type == "owner":
                 self.fields["business"] = BusinessOnlySerializer()
@@ -450,6 +454,4 @@ class CreateDentistSerializer(serializers.ModelSerializer):
             # verification_token.save()
             business.save()
 
-
         return instance
-

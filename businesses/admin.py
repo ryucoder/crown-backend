@@ -16,7 +16,7 @@ from core.models import State
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
 
-    list_filter = ["from_business", "to_business"]
+    list_filter = ["is_urgent", "is_active", "from_business", "to_business",]
 
     list_display = [
         "id",
@@ -26,6 +26,7 @@ class OrderAdmin(admin.ModelAdmin):
         "to_user",
         "latest_status",
         "is_urgent",
+        "is_active",
         "delivery_date",
         "created_at",
         "modified_at",

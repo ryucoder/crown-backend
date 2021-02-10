@@ -52,6 +52,16 @@ class EmailUser(PrimaryUUIDTimeStampedModel, AbstractUser):
 
         return business
 
+    def get_business(self):
+        business = None 
+
+        if self.user_type == "owner": 
+            business = self.business
+        else: 
+            business = self.employer.business
+
+        return business
+
     def __str__(self):
         return f"{self.email}"
 

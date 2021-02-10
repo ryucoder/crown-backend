@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 
 from core.models import PrimaryUUIDTimeStampedModel
 
@@ -166,7 +166,7 @@ class Order(PrimaryUUIDTimeStampedModel):
     patient_name = models.CharField(max_length=255)
     patient_age = models.PositiveIntegerField()
 
-    referrer = models.CharField(max_length=255)
+    referrer = models.CharField(max_length=255, null=True, blank=True)
 
     delivery_date = models.DateTimeField()
 
@@ -175,6 +175,7 @@ class Order(PrimaryUUIDTimeStampedModel):
     options = models.ManyToManyField("core.OrderOption", related_name="orders")
 
     is_urgent = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
 
     teeth = models.JSONField()
     # upper_left_1 = models.BooleanField(default=False, verbose_name="UL1")

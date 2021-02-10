@@ -21,7 +21,7 @@ from rest_framework.routers import DefaultRouter
 
 from core.views import StateViewset, OrderOptionViewset
 
-from businesses.views import BusinessViewset
+from businesses.views import BusinessViewset, OrderViewset
 
 from users.views import EmailUserViewset
 
@@ -31,6 +31,7 @@ default_router.register(
     r"api/order-options", OrderOptionViewset, basename="order-option"
 )
 default_router.register(r"api/businesses", BusinessViewset, basename="businesses")
+default_router.register(r"api/orders", OrderViewset, basename="orders")
 default_router.register(r"api/users", EmailUserViewset, basename="users")
 
 
