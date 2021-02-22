@@ -385,11 +385,11 @@ class MobileTokenSerializer(serializers.ModelSerializer):
         len_mobile = len(str(mobile).strip())
 
         if len_mobile < 10:
-            message = "server_mobile_less_than_ten"
+            message = "server_min_length"
             raise serializers.ValidationError(message)
 
         if len_mobile > 10:
-            message = "server_mobile_more_than_ten"
+            message = "server_max_length"
             raise serializers.ValidationError(message)
 
         queryset = EmailUser.objects.filter(mobile=mobile)
@@ -397,6 +397,13 @@ class MobileTokenSerializer(serializers.ModelSerializer):
         if not queryset.exists():
             message = "server_mobile_absent"
             raise serializers.ValidationError(message)
+
+        latest_token = MobileToken.objects.filter(mobile=mobile).order_by("-created_at").first()
+
+        if latest_token != None: 
+            if timezone.now() < latest_token.expiry:
+                message = "server_mobile_token_not_expired"
+                raise serializers.ValidationError(message)
 
         return queryset.first()
 
