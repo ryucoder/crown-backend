@@ -128,6 +128,40 @@ class OrderSerializer(serializers.ModelSerializer):
 
         return options_ids 
 
+    def validate_teeth(self, teeth):
+        
+        length = len(teeth.keys())
+
+        if length < 1:
+            message = "server_teeth_min"
+            raise serializers.ValidationError(message)
+
+        if length > 32:
+            message = "server_teeth_max"
+            raise serializers.ValidationError(message)
+
+        teeth_key_range = [str(item) for item in range(1, 9)]
+
+        for key, value in teeth.items():
+
+            if key[0] not in ["u", "l"]:
+                message = "server_invalid_key_start"
+                raise serializers.ValidationError(message)
+            
+            if key[1] not in ["l", "r"]:
+                message = "server_invalid_key_side"
+                raise serializers.ValidationError(message)
+
+            if key[3] not in teeth_key_range:
+                message = "server_invalid_key_end"
+                raise serializers.ValidationError(message)
+
+            if value != True: 
+                message = "server_invalid_value"
+                raise serializers.ValidationError(message)
+
+        return teeth
+
     class Meta:
         model = Order
         fields = [
@@ -156,20 +190,10 @@ class OrderSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         options_ids = validated_data.pop("options_ids")
-        # write_teeth = validated_data.pop("write_teeth")
-        # to_user = validated_data.pop("to_user_id")
         to_business = validated_data.pop("to_business_id")
         from_user_id = validated_data.pop("from_user_id")
 
-        # from_user_id = "743b88f4-5a42-44e2-8187-c43e1be49d1a"
-        print()
-        print()
-        print("from_user_id")
-        print(from_user_id)
-        print()
-        print()
         options = OrderOption.objects.filter(id__in=options_ids)
-
 
         instance = Order(**validated_data)
         instance.latest_status = "pending"
