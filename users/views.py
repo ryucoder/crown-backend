@@ -54,6 +54,9 @@ class EmailUserViewset(RetrieveModelMixin, viewsets.GenericViewSet):
         if self.action == "request_mobile_token":
             return serializers.MobileTokenSerializer
 
+        if self.action == "verify_mobile_token":
+            return serializers.VerifyMobileTokenSerializer
+
         # if self.action == "retrieve":
         #     return EmailUserDetailSerializer
 
