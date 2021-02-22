@@ -51,6 +51,9 @@ class EmailUserViewset(RetrieveModelMixin, viewsets.GenericViewSet):
         if self.action == "create_dentist":
             return serializers.CreateDentistSerializer
 
+        if self.action == "request_mobile_token":
+            return serializers.MobileTokenSerializer
+
         # if self.action == "retrieve":
         #     return EmailUserDetailSerializer
 
@@ -158,14 +161,14 @@ class EmailUserViewset(RetrieveModelMixin, viewsets.GenericViewSet):
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    # @action(detail=False, methods=["post"])
-    # def request_mobile_token(self, request, *args, **kwargs):
+    @action(detail=False, methods=["post"])
+    def request_mobile_token(self, request, *args, **kwargs):
 
-    #     serializer = MobileTokenSerializer(data=request.data)
-    #     serializer.is_valid(raise_exception=True)
+        serializer = serializers.MobileTokenSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-    #     instance = serializer.save()
+        instance = serializer.save()
 
-    #     data = {"message": "mobile_token_generated"}
+        data = {"message": "mobile_token_generated"}
 
-    #     return Response(data=data, status=status.HTTP_200_OK)
+        return Response(data=data, status=status.HTTP_200_OK)

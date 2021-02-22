@@ -27,6 +27,7 @@ class MobileTokenAdmin(admin.ModelAdmin):
 
     list_display = [
         "id",
+        "email_user",
         "mobile",
         "token",
         "expiry",

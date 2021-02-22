@@ -102,7 +102,7 @@ class MobileToken(PrimaryUUIDTimeStampedModel):
         on_delete=models.CASCADE,
     )
     mobile = models.BigIntegerField()
-    token = models.IntegerField()
+    token = models.CharField(max_length=6)
     expiry = models.DateTimeField()
     is_used = models.BooleanField(default=False)
     used_time = models.DateTimeField(null=True, blank=True)

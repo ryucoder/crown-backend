@@ -1,4 +1,5 @@
 import uuid
+import random
 
 from datetime import timedelta
 
@@ -12,9 +13,10 @@ from rest_framework.validators import UniqueValidator
 from core.serializers import ServerErrorSerializer
 from core.utils import EmailUtil, TimeUtil
 
-from users.models import EmailUser, PasswordToken
+from users.models import EmailUser, PasswordToken, MobileToken
 from users.constants import (
     SIGNUP_TOKEN_EXPIRY_MINUTES,
+    MOBILE_TOKEN_EXPIRY_MINUTES,
     CUSTOM_ERROR_MESSAGES,
     DEFAULT_DENTIST_PASSWORD,
 )
@@ -375,6 +377,51 @@ class ResetPasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError(message)
 
         return data
+
+
+class MobileTokenSerializer(serializers.ModelSerializer):
+
+    def validate_mobile(self, mobile):
+        len_mobile = len(str(mobile).strip())
+
+        if len_mobile < 10:
+            message = "server_mobile_less_than_ten"
+            raise serializers.ValidationError(message)
+
+        if len_mobile > 10:
+            message = "server_mobile_more_than_ten"
+            raise serializers.ValidationError(message)
+
+        queryset = EmailUser.objects.filter(mobile=mobile)
+
+        if not queryset.exists():
+            message = "server_mobile_absent"
+            raise serializers.ValidationError(message)
+
+        return queryset.first()
+
+    def create(self, validated_data):
+
+        email_user = validated_data.pop("mobile")
+
+        instance = MobileToken()
+        instance.email_user = email_user
+        instance.mobile = email_user.mobile
+        instance.token = str(random.randint(100000, 999999))
+        instance.expiry = TimeUtil.get_minutes_from_now(MOBILE_TOKEN_EXPIRY_MINUTES) 
+        instance.is_used = False
+
+        instance.save()
+
+        # NOTE: SHOULD HAPPEN SYNCHRNOUSLY ONLY. CELERY TASK SHOULD NOT BE CREATED FOR THIS.
+        # SmsUtil.send_mobile_token_sms(instance)
+
+        return instance
+
+    class Meta:
+        model = MobileToken
+        fields = ["mobile", "token", "expiry"]
+        read_only_fields = ["token", "expiry"]
 
 
 class CreateDentistSerializer(serializers.ModelSerializer):
