@@ -172,3 +172,15 @@ class EmailUserViewset(RetrieveModelMixin, viewsets.GenericViewSet):
         data = {"message": "mobile_token_generated"}
 
         return Response(data=data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=["post"])
+    def verify_mobile_token(self, request, *args, **kwargs):
+
+        serializer = serializers.VerifyMobileTokenSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        instance = serializer.save()
+
+        data = {"message": "mobile_token_verified"}
+
+        return Response(data=data, status=status.HTTP_200_OK)

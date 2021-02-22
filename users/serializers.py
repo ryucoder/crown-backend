@@ -431,6 +431,68 @@ class MobileTokenSerializer(serializers.ModelSerializer):
         read_only_fields = ["token", "expiry"]
 
 
+class VerifyMobileTokenSerializer(serializers.ModelSerializer):
+
+    def validate_token(self, token):
+
+        mobile = self.initial_data["mobile"]
+
+        latest_token = MobileToken.objects.filter(mobile=mobile, token=token).order_by("-created_at").first()
+
+        if latest_token == None: 
+            message = "server__absent"
+            raise serializers.ValidationError(message)
+
+        else:
+            if timezone.now() > latest_token.expiry:
+                message = "server_expired"
+                raise serializers.ValidationError(message)
+
+            if latest_token.is_used:
+                message = "server_used_already"
+                raise serializers.ValidationError(message)
+
+        return latest_token 
+
+    def validate_mobile(self, mobile):
+        len_mobile = len(str(mobile).strip())
+
+        if len_mobile < 10:
+            message = "server_min_length"
+            raise serializers.ValidationError(message)
+
+        if len_mobile > 10:
+            message = "server_max_length"
+            raise serializers.ValidationError(message)
+
+        queryset = EmailUser.objects.filter(mobile=mobile)
+
+        if not queryset.exists():
+            message = "server_mobile_absent"
+            raise serializers.ValidationError(message)
+
+        return queryset.first()
+
+    def create(self, validated_data):
+
+        token = validated_data.pop("token")
+
+        token.is_used = True
+        token.used_time = TimeUtil.get_minutes_from_now(0) 
+
+        token.save()
+
+        # NOTE: SHOULD HAPPEN SYNCHRNOUSLY ONLY. CELERY TASK SHOULD NOT BE CREATED FOR THIS.
+        # SmsUtil.send_mobile_token_sms(instance)
+
+        return token
+
+    class Meta:
+        model = MobileToken
+        fields = ["mobile", "token", "expiry"]
+        read_only_fields = ["expiry"]
+
+
 class CreateDentistSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(
         max_length=255,
