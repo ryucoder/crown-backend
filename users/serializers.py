@@ -110,13 +110,13 @@ class LaboratorySignUpSerializer(serializers.ModelSerializer):
     )
     password_one = serializers.CharField(
         min_length=9,
-        max_length=255,
+        max_length=18,
         write_only=True,
         error_messages=CUSTOM_ERROR_MESSAGES["CharField"],
     )
     password_two = serializers.CharField(
         min_length=9,
-        max_length=255,
+        max_length=18,
         write_only=True,
         error_messages=CUSTOM_ERROR_MESSAGES["CharField"],
     )
@@ -137,16 +137,6 @@ class LaboratorySignUpSerializer(serializers.ModelSerializer):
         ],
     )
 
-    def validate(self, data):
-        password_one = data["password_one"]
-        password_two = data["password_two"]
-
-        if password_one != password_two:
-            message = "passwords_not_match"
-            raise serializers.ValidationError(message)
-
-        return data
-
     def validate_email(self, email):
         email = email.strip().lower()
         queryset = EmailUser.objects.filter(email__iexact=email)
@@ -156,6 +146,15 @@ class LaboratorySignUpSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(message)
 
         return email
+
+    def validate_password_two(self, password_two):
+        password_one = self.initial_data.get("password_one")
+
+        if password_one != password_two:
+            message = "server_passwords_not_match"
+            raise serializers.ValidationError(message)
+
+        return password_two
 
     class Meta:
         model = EmailUser
@@ -304,7 +303,7 @@ class RequestPasswordResetSerializer(serializers.Serializer):
             if (latest_token.is_used == False) and (
                 latest_token.expiry > timezone.now()
             ):
-                message = "latest_token_unused_and_not_expired"
+                message = "server_latest_token_unused"
                 raise serializers.ValidationError(message)
 
         return data

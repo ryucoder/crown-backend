@@ -32,4 +32,50 @@ Chetan@gmail.com
 
 "STRING".strip().lower()
 
+123456789123456789
+
+
+
+Client will goto catalogue and save a product to saved items list 
+code and name 
+add multiple design links
+tooltip to share open links only 
+
+
+
+Create initial quotation 
+Client will receive replies 
+client will approve only one reply it will be stored. 
+client can add it to cart - one time development cost is defined by manufacturer. 
+Every subsequent order, it will be zero.
+client place an order - 
+tags 
+saved item order or normal order, 
+new order or prpeviously fulfilled order 
+
+
+
+is_used     t   t   f   f 
+is_expired  t   f   t   f 
+
+
+create new 
+
+create new 
+
+create new 
+
+
+dont create 
+
+
+
+if previous is expired, create new 
+
+
+if previous is used; create new 
+if previous is not used; dont create new 
+
+if previous is not used; dont create new 
+
 

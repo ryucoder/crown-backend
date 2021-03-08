@@ -42,12 +42,16 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework_simplejwt",
+    
+    "corsheaders",
+
     "core",
     "users",
     "businesses",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -150,3 +154,5 @@ DEFAULT_FROM_EMAIL = "rockstar.ryucoder@gmail.com"
 
 SENDGRID_TEMPLATE_ID_LABORATORY_SIGNUP_EMAIL = "d-8580bdbb342f4d0dafbd6e9ae46399f3"
 SENDGRID_TEMPLATE_ID_REQUEST_PASSWORD_RESET_EMAIL = "d-8580bdbb342f4d0dafbd6e9ae46399f3"
+
+CORS_ALLOW_ALL_ORIGINS = True
