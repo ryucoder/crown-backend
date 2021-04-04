@@ -329,11 +329,11 @@ class ResetPasswordSerializer(serializers.Serializer):
 
     def validate_email(self, email):
         email = email.strip().lower()
-        token = self.initial_data["token"].strip()
+        # token = self.initial_data["token"].strip()
 
         # TODO: same sql is being run twice, need a fix for this.
         queryset = PasswordToken.objects.filter(
-            email_user__email=email, token=token
+            email_user__email=email
         ).order_by("-created_at")
 
         if not queryset.exists():
