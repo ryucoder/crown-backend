@@ -27,7 +27,7 @@ from businesses.serializers import BusinessOnlySerializer
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
-    password = serializers.CharField(max_length=255)
+    password = serializers.CharField(min_length=9, max_length=18)
 
     def validate(self, data):
         email_absent = False
