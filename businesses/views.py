@@ -2,12 +2,7 @@ from django.shortcuts import render
 
 from rest_framework import viewsets
 
-from rest_framework_simplejwt.authentication import (
-    JWTAuthentication,
-    JWTTokenUserAuthentication,
-)
-
-from core.utils import CurrentPagePagination
+from core.utils import CurrentPagePagination, CommonUtil
 
 from businesses.serializers import BusinessSerializer, OrderSerializer
 from businesses.models import Business, Order
@@ -16,6 +11,7 @@ from businesses.models import Business, Order
 class BusinessViewset(viewsets.ModelViewSet):
 
     serializer_class = BusinessSerializer
+    authentication_classes = CommonUtil.get_authentication_classes()
 
     def get_queryset(self):
         queryset = Business.objects.all().prefetch_related(
@@ -28,7 +24,7 @@ class OrderViewset(viewsets.ModelViewSet):
 
     serializer_class = OrderSerializer
     pagination_class = CurrentPagePagination
-    authentication_classes = [JWTTokenUserAuthentication]
+    authentication_classes = CommonUtil.get_authentication_classes()
 
     def get_queryset(self):
         queryset = Order.objects.all().order_by("-created_at").prefetch_related("options")

@@ -137,13 +137,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media-root")
 AUTH_USER_MODEL = "users.EmailUser"
 
 
-REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": (
-        # "rest_framework.permissions.IsAuthenticatedOrReadOnly",
-        "rest_framework.permissions.IsAuthenticated",  # For Prod
-    ),
-}
-
 SIMPLE_JWT = {
     # "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),  # for production
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1), # for testing

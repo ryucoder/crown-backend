@@ -3,7 +3,7 @@ from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
-from core.utils import TimeUtil, EmailUtil
+from core.utils import TimeUtil, EmailUtil, CommonUtil
 
 from users import serializers
 from users.models import EmailUser, PasswordToken
@@ -187,3 +187,24 @@ class EmailUserViewset(RetrieveModelMixin, viewsets.GenericViewSet):
         data = {"message": "mobile_token_verified"}
 
         return Response(data=data, status=status.HTTP_200_OK)
+
+
+class RegisteredEmailUserViewset(viewsets.ModelViewSet):
+    authentication_classes = CommonUtil.get_authentication_classes()
+
+    def get_queryset(self):
+        queryset = EmailUser.objects.filter(id=self.request.user.id).select_related(
+            "business",
+            "employer",
+        )
+        return queryset
+
+    @action(detail=False, methods=["get"])
+    def user_details(self, request, *args, **kwargs):
+
+        # instance = EmailUser.objects.filter(id=request.user.id).first()
+        instance = self.get_queryset().first()
+
+        serializer = serializers.EmailUserWithBusinessSerializer(instance=instance)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)

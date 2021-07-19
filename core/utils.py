@@ -9,6 +9,9 @@ from django.core.paginator import InvalidPage
 
 from rest_framework import pagination
 from rest_framework.response import Response
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+
+from rest_framework_simplejwt.authentication import JWTTokenUserAuthentication
 
 from sendgrid.sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
@@ -30,6 +33,20 @@ class CurrentPagePagination(pagination.PageNumberPagination):
                 "results": data,
             }
         )
+
+
+class CommonUtil:
+    @staticmethod
+    def get_authentication_classes():
+        authentication_classes = [
+            JWTTokenUserAuthentication,
+        ]
+
+        if settings.ENVIRONMENT != "production":
+            authentication_classes.append(SessionAuthentication)
+            authentication_classes.append(BasicAuthentication)
+
+        return authentication_classes
 
 
 class EmailUtil:
