@@ -1,28 +1,20 @@
-import uuid
 import random
+import uuid
 
-from datetime import timedelta
-
+from businesses.models import Business, BusinessConnect
+from businesses.serializers import BusinessOnlySerializer
+from core.serializers import ServerErrorSerializer
+from core.utils import EmailUtil, TimeUtil
+from django.contrib.auth.hashers import make_password
 from django.db import transaction
 from django.utils import timezone
-from django.contrib.auth.hashers import make_password
-
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from core.serializers import ServerErrorSerializer
-from core.utils import EmailUtil, TimeUtil
-
-from users.models import EmailUser, PasswordToken, MobileToken
-from users.constants import (
-    SIGNUP_TOKEN_EXPIRY_MINUTES,
-    MOBILE_TOKEN_EXPIRY_MINUTES,
-    CUSTOM_ERROR_MESSAGES,
-    DEFAULT_DENTIST_PASSWORD,
-)
-
-from businesses.models import Business
-from businesses.serializers import BusinessOnlySerializer
+from users.constants import (CUSTOM_ERROR_MESSAGES, DEFAULT_USER_PASSWORD,
+                             MOBILE_TOKEN_EXPIRY_MINUTES,
+                             SIGNUP_TOKEN_EXPIRY_MINUTES)
+from users.models import EmailUser, MobileToken, PasswordToken
 
 
 class LoginSerializer(serializers.Serializer):
@@ -496,7 +488,7 @@ class VerifyMobileTokenSerializer(serializers.ModelSerializer):
         read_only_fields = ["expiry"]
 
 
-class CreateDentistSerializer(serializers.ModelSerializer):
+class CreateRelatedBusinessSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(
         max_length=255,
         required=True,
@@ -547,9 +539,10 @@ class CreateDentistSerializer(serializers.ModelSerializer):
         company_name = validated_data.pop("company_name")
 
         instance = EmailUser(**validated_data)
-        instance.password = make_password(DEFAULT_DENTIST_PASSWORD)
+        instance.password = make_password(DEFAULT_USER_PASSWORD)
         instance.user_type = "owner"
         instance.is_email_verified = False
+        instance.is_mobile_verified = False
 
         # # EMAIL TOKEN
         # verification_token = PasswordToken()
@@ -561,16 +554,32 @@ class CreateDentistSerializer(serializers.ModelSerializer):
         #     SIGNUP_TOKEN_EXPIRY_MINUTES
         # )
 
+        users_business = self.context["user"].get_business()
+
         # Business
         business = Business()
         business.name = company_name
         business.owner = instance
-        business.category = "dentist"
+        business.category = (
+            "dentist" if users_business.category == "laboratory" else "laboratory"
+        )
         business.is_active = True
+
+        connect = BusinessConnect()
+        related_business = business
+
+        if users_business.category == "dentist":
+            connect.dentist = users_business
+            connect.laboratory = related_business
+
+        else:
+            connect.dentist = related_business
+            connect.laboratory = users_business
 
         with transaction.atomic():
             instance.save()
             # verification_token.save()
             business.save()
+            connect.save()
 
         return instance

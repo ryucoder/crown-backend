@@ -1,14 +1,13 @@
-from rest_framework.mixins import RetrieveModelMixin
+from core.utils import CommonUtil, EmailUtil, TimeUtil
 from rest_framework import status, viewsets
-from rest_framework.response import Response
 from rest_framework.decorators import action
-
-from core.utils import TimeUtil, EmailUtil, CommonUtil
+from rest_framework.mixins import RetrieveModelMixin
+from rest_framework.response import Response
 
 from users import serializers
+from users.constants import RESET_PASSWORD_TOKEN_EXPIRY_MINUTES
 from users.models import EmailUser, PasswordToken
 from users.utils import PasswordUtil
-from users.constants import RESET_PASSWORD_TOKEN_EXPIRY_MINUTES
 
 # from rest_framework_simplejwt.authentication import (
 #     JWTAuthentication,
@@ -48,8 +47,8 @@ class EmailUserViewset(RetrieveModelMixin, viewsets.GenericViewSet):
         if self.action == "laboratory_verify_signup":
             return serializers.LaboratoryVerifySignUpSerializer
 
-        if self.action == "create_dentist":
-            return serializers.CreateDentistSerializer
+        if self.action == "create_related_business":
+            return serializers.CreateRelatedBusinessSerializer
 
         if self.action == "request_mobile_token":
             return serializers.MobileTokenSerializer
@@ -153,9 +152,11 @@ class EmailUserViewset(RetrieveModelMixin, viewsets.GenericViewSet):
         return Response(data=data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=["post"])
-    def create_dentist(self, request, *args, **kwargs):
+    def create_related_business(self, request, *args, **kwargs):
 
-        serializer = serializers.CreateDentistSerializer(data=request.data)
+        serializer = serializers.CreateRelatedBusinessSerializer(
+            data=request.data, context={"user": request.user}
+        )
         serializer.is_valid(raise_exception=True)
 
         instance = serializer.save()
