@@ -1,6 +1,5 @@
-from django.db import models, transaction
-
 from core.models import PrimaryUUIDTimeStampedModel
+from django.db import models, transaction
 
 from businesses.constants import CATEGORY_CHOICES, ORDER_STATUS_CHOICES
 
@@ -21,6 +20,13 @@ class Business(PrimaryUUIDTimeStampedModel):
     )
 
     is_active = models.BooleanField(default=True)
+
+    connected_businesses = models.ManyToManyField(
+        "businesses.Business",
+        related_name="business",
+        blank=True,
+        through="BusinessConnect",
+    )
 
     def __str__(self):
         return f"{self.id} - {self.name}"
@@ -135,6 +141,24 @@ class BusinessAccount(PrimaryUUIDTimeStampedModel):
     class Meta:
         verbose_name = "Business Account"
         verbose_name_plural = "Business Accounts"
+
+
+class BusinessConnect(PrimaryUUIDTimeStampedModel):
+    dentist = models.ForeignKey(
+        "businesses.Business", related_name="dentists", on_delete=models.CASCADE
+    )
+    laboratory = models.ForeignKey(
+        "businesses.Business",
+        related_name="laboratories",
+        on_delete=models.CASCADE,
+    )
+
+    def __str__(self):
+        return f"{self.id} - {self.business} - {self.account_type}"
+
+    class Meta:
+        verbose_name = "Business Connect"
+        verbose_name_plural = "Business Connects"
 
 
 class OrderStatus(PrimaryUUIDTimeStampedModel):

@@ -27,7 +27,9 @@ class OrderViewset(viewsets.ModelViewSet):
     authentication_classes = CommonUtil.get_authentication_classes()
 
     def get_queryset(self):
-        queryset = Order.objects.all().order_by("-created_at").prefetch_related("options")
+        queryset = (
+            Order.objects.all().order_by("-created_at").prefetch_related("options")
+        )
         return queryset
 
     def perform_create(self, serializer):

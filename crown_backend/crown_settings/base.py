@@ -42,9 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework_simplejwt",
-    
     "corsheaders",
-
     "core",
     "users",
     "businesses",
@@ -139,7 +137,7 @@ AUTH_USER_MODEL = "users.EmailUser"
 
 SIMPLE_JWT = {
     # "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),  # for production
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=1), # for testing
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),  # for testing
 }
 
 

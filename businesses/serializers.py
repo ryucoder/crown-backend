@@ -90,35 +90,33 @@ class OrderSerializer(serializers.ModelSerializer):
 
     options = OrderOptionSerializer(read_only=True, many=True)
 
-    options_ids = serializers.ListField(
-        child=serializers.UUIDField(), write_only=True
-    )
+    options_ids = serializers.ListField(child=serializers.UUIDField(), write_only=True)
 
     to_business_id = serializers.UUIDField(write_only=True)
 
     # to_user_id = serializers.UUIDField(write_only=True)
     # def validate_to_user_id(self, to_user_id):
-        
+
     #     queryset = EmailUser.objects.filter(id=to_user_id)
 
     #     if not queryset.exists():
     #         message = "server_absent_to_user_id"
     #         raise serializers.ValidationError(message)
 
-    #     return queryset.first() 
+    #     return queryset.first()
 
     def validate_to_business_id(self, to_business_id):
-        
+
         queryset = Business.objects.filter(id=to_business_id)
 
         if not queryset.exists():
             message = "server_absent_to_business_id"
             raise serializers.ValidationError(message)
 
-        return queryset.first() 
+        return queryset.first()
 
     def validate_options_ids(self, options_ids):
-        
+
         valid_ids = OrderOption.objects.values_list("id", flat=True)
 
         for option_id in options_ids:
@@ -126,10 +124,10 @@ class OrderSerializer(serializers.ModelSerializer):
                 message = "server_invalid_option_id"
                 raise serializers.ValidationError(message)
 
-        return options_ids 
+        return options_ids
 
     def validate_teeth(self, teeth):
-        
+
         length = len(teeth.keys())
 
         if length < 1:
@@ -147,7 +145,7 @@ class OrderSerializer(serializers.ModelSerializer):
             if key[0] not in ["u", "l"]:
                 message = "server_invalid_key_start"
                 raise serializers.ValidationError(message)
-            
+
             if key[1] not in ["l", "r"]:
                 message = "server_invalid_key_side"
                 raise serializers.ValidationError(message)
@@ -156,7 +154,7 @@ class OrderSerializer(serializers.ModelSerializer):
                 message = "server_invalid_key_end"
                 raise serializers.ValidationError(message)
 
-            if value != True: 
+            if value != True:
                 message = "server_invalid_value"
                 raise serializers.ValidationError(message)
 
@@ -185,8 +183,13 @@ class OrderSerializer(serializers.ModelSerializer):
             "to_business",
             "to_user",
         ]
-        read_only_fields = ["from_user", "to_user", "from_business", "to_business", "latest_status"]
-
+        read_only_fields = [
+            "from_user",
+            "to_user",
+            "from_business",
+            "to_business",
+            "latest_status",
+        ]
 
     def create(self, validated_data):
         options_ids = validated_data.pop("options_ids")
@@ -203,7 +206,7 @@ class OrderSerializer(serializers.ModelSerializer):
         instance.from_business = EmailUser.objects.get(id=from_user_id).get_business()
 
         order_status = OrderStatus()
-        order_status.order = instance 
+        order_status.order = instance
         order_status.status = instance.latest_status
         order_status.user_id = from_user_id
 

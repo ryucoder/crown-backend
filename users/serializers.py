@@ -332,9 +332,9 @@ class ResetPasswordSerializer(serializers.Serializer):
         # token = self.initial_data["token"].strip()
 
         # TODO: same sql is being run twice, need a fix for this.
-        queryset = PasswordToken.objects.filter(
-            email_user__email=email
-        ).order_by("-created_at")
+        queryset = PasswordToken.objects.filter(email_user__email=email).order_by(
+            "-created_at"
+        )
 
         if not queryset.exists():
             message = "server_absent"
@@ -379,7 +379,6 @@ class ResetPasswordSerializer(serializers.Serializer):
 
 
 class MobileTokenSerializer(serializers.ModelSerializer):
-
     def validate_mobile(self, mobile):
         len_mobile = len(str(mobile).strip())
 
@@ -397,9 +396,11 @@ class MobileTokenSerializer(serializers.ModelSerializer):
             message = "server_mobile_absent"
             raise serializers.ValidationError(message)
 
-        latest_token = MobileToken.objects.filter(mobile=mobile).order_by("-created_at").first()
+        latest_token = (
+            MobileToken.objects.filter(mobile=mobile).order_by("-created_at").first()
+        )
 
-        if latest_token != None: 
+        if latest_token != None:
             if timezone.now() < latest_token.expiry:
                 message = "server_mobile_token_not_expired"
                 raise serializers.ValidationError(message)
@@ -414,7 +415,7 @@ class MobileTokenSerializer(serializers.ModelSerializer):
         instance.email_user = email_user
         instance.mobile = email_user.mobile
         instance.token = str(random.randint(100000, 999999))
-        instance.expiry = TimeUtil.get_minutes_from_now(MOBILE_TOKEN_EXPIRY_MINUTES) 
+        instance.expiry = TimeUtil.get_minutes_from_now(MOBILE_TOKEN_EXPIRY_MINUTES)
         instance.is_used = False
 
         instance.save()
@@ -431,14 +432,17 @@ class MobileTokenSerializer(serializers.ModelSerializer):
 
 
 class VerifyMobileTokenSerializer(serializers.ModelSerializer):
-
     def validate_token(self, token):
 
         mobile = self.initial_data["mobile"]
 
-        latest_token = MobileToken.objects.filter(mobile=mobile, token=token).order_by("-created_at").first()
+        latest_token = (
+            MobileToken.objects.filter(mobile=mobile, token=token)
+            .order_by("-created_at")
+            .first()
+        )
 
-        if latest_token == None: 
+        if latest_token == None:
             message = "server__absent"
             raise serializers.ValidationError(message)
 
@@ -451,7 +455,7 @@ class VerifyMobileTokenSerializer(serializers.ModelSerializer):
                 message = "server_used_already"
                 raise serializers.ValidationError(message)
 
-        return latest_token 
+        return latest_token
 
     def validate_mobile(self, mobile):
         len_mobile = len(str(mobile).strip())
@@ -477,7 +481,7 @@ class VerifyMobileTokenSerializer(serializers.ModelSerializer):
         token = validated_data.pop("token")
 
         token.is_used = True
-        token.used_time = TimeUtil.get_minutes_from_now(0) 
+        token.used_time = TimeUtil.get_minutes_from_now(0)
 
         token.save()
 

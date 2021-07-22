@@ -1,4 +1,3 @@
-
 """crown_backend URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
@@ -30,15 +29,16 @@ default_router.register(
 default_router.register(r"api/businesses", BusinessViewset, basename="businesses")
 default_router.register(r"api/orders", OrderViewset, basename="orders")
 default_router.register(r"api/users", EmailUserViewset, basename="users")
-default_router.register(r"api/users/registered", RegisteredEmailUserViewset, basename="regisitered_users")
+default_router.register(
+    r"api/users/registered", RegisteredEmailUserViewset, basename="regisitered_users"
+)
 
-from rest_framework_simplejwt.views import (TokenObtainPairView,
-                                            TokenRefreshView)
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('api/token/obtain/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path("api/token/obtain/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 ]
 
 urlpatterns += default_router.urls
