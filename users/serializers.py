@@ -11,9 +11,12 @@ from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from users.constants import (CUSTOM_ERROR_MESSAGES, DEFAULT_USER_PASSWORD,
-                             MOBILE_TOKEN_EXPIRY_MINUTES,
-                             SIGNUP_TOKEN_EXPIRY_MINUTES)
+from users.constants import (
+    CUSTOM_ERROR_MESSAGES,
+    DEFAULT_USER_PASSWORD,
+    MOBILE_TOKEN_EXPIRY_MINUTES,
+    SIGNUP_TOKEN_EXPIRY_MINUTES,
+)
 from users.models import EmailUser, MobileToken, PasswordToken
 
 
@@ -554,7 +557,14 @@ class CreateRelatedBusinessSerializer(serializers.ModelSerializer):
         #     SIGNUP_TOKEN_EXPIRY_MINUTES
         # )
 
-        users_business = self.context["user"].get_business()
+        user_id = self.context["user_id"]
+
+        users_business = (
+            EmailUser.objects.filter(id=user_id)
+            .select_related("business")
+            .first()
+            .get_business()
+        )
 
         # Business
         business = Business()

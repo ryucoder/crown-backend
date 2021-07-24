@@ -152,20 +152,6 @@ class EmailUserViewset(RetrieveModelMixin, viewsets.GenericViewSet):
         return Response(data=data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=["post"])
-    def create_related_business(self, request, *args, **kwargs):
-
-        serializer = serializers.CreateRelatedBusinessSerializer(
-            data=request.data, context={"user": request.user}
-        )
-        serializer.is_valid(raise_exception=True)
-
-        instance = serializer.save()
-
-        serializer = serializers.EmailUserWithBusinessSerializer(instance=instance)
-
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    @action(detail=False, methods=["post"])
     def request_mobile_token(self, request, *args, **kwargs):
 
         serializer = serializers.MobileTokenSerializer(data=request.data)
@@ -209,3 +195,17 @@ class RegisteredEmailUserViewset(viewsets.ModelViewSet):
         serializer = serializers.EmailUserWithBusinessSerializer(instance=instance)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=["post"])
+    def create_related_business(self, request, *args, **kwargs):
+
+        serializer = serializers.CreateRelatedBusinessSerializer(
+            data=request.data, context={"user_id": request.user.pk}
+        )
+        serializer.is_valid(raise_exception=True)
+
+        instance = serializer.save()
+
+        serializer = serializers.EmailUserWithBusinessSerializer(instance=instance)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
