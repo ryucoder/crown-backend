@@ -593,3 +593,71 @@ class CreateRelatedBusinessSerializer(serializers.ModelSerializer):
             connect.save()
 
         return instance
+
+
+class ConnectRelatedBusinessSerializer(serializers.ModelSerializer):
+    connect_id = serializers.UUIDField(
+        write_only=True,
+        error_messages=CUSTOM_ERROR_MESSAGES["UUIDField"],
+    )
+
+    def validate_connect_id(self, connect_id):
+        user = self.context["user"]
+
+        user_business = user.get_business()
+        business = Business.objects.filter(id=connect_id).first()
+
+        if business is None:
+            message = "server_absent_connect_id"
+            raise serializers.ValidationError(message)
+
+        if user_business.category == business.category:
+            message = "server_invalid_connect_id"
+            raise serializers.ValidationError(message)
+
+        if user_business.category == "dentist":
+            dentist_id = user_business.id
+            laboratory_id = business.id
+        else:
+            dentist_id = business.id
+            laboratory_id = user_business.id
+
+        queryset = BusinessConnect.objects.filter(
+            dentist_id=dentist_id, laboratory_id=laboratory_id
+        )
+        if queryset.exists():
+            message = "server_exists_already"
+            raise serializers.ValidationError(message)
+
+        return business
+
+    class Meta:
+        model = BusinessConnect
+        fields = [
+            "id",
+            "dentist",
+            "laboratory",
+            "connect_id",
+        ]
+        read_only_fields = ["dentist", "laboratory"]
+
+    def create(self, validated_data):
+
+        user = self.context["user"]
+
+        connect = BusinessConnect()
+        users_business = user.get_business()
+        related_business = validated_data["connect_id"]
+
+        if users_business.category == "dentist":
+            connect.dentist = users_business
+            connect.laboratory = related_business
+
+        else:
+            connect.dentist = related_business
+            connect.laboratory = users_business
+
+        with transaction.atomic():
+            connect.save()
+
+        return connect

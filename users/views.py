@@ -209,3 +209,22 @@ class RegisteredEmailUserViewset(viewsets.ModelViewSet):
         serializer = serializers.EmailUserWithBusinessSerializer(instance=instance)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=["post"])
+    def connect_related_business(self, request, *args, **kwargs):
+
+        user = (
+            EmailUser.objects.filter(id=request.user.pk)
+            .select_related("business")
+            .first()
+        )
+        serializer = serializers.ConnectRelatedBusinessSerializer(
+            data=request.data, context={"user": user}
+        )
+        serializer.is_valid(raise_exception=True)
+
+        instance = serializer.save()
+
+        # serializer = serializers.EmailUserWithBusinessSerializer(instance=instance)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
