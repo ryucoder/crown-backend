@@ -226,3 +226,13 @@ class RegisteredEmailUserViewset(viewsets.ModelViewSet):
         instance = serializer.save()
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=["post"])
+    def toggle_business_connect(self, request, *args, **kwargs):
+
+        serializer = serializers.ToggleBusinessConnectSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        instance = serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)

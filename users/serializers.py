@@ -661,3 +661,38 @@ class ConnectRelatedBusinessSerializer(serializers.ModelSerializer):
             connect.save()
 
         return connect
+
+
+class ToggleBusinessConnectSerializer(serializers.ModelSerializer):
+    connect_id = serializers.UUIDField(
+        write_only=True,
+        error_messages=CUSTOM_ERROR_MESSAGES["UUIDField"],
+    )
+
+    def validate_connect_id(self, connect_id):
+
+        queryset = BusinessConnect.objects.filter(id=connect_id)
+        if not queryset.exists():
+            message = "server_absent_connect_id"
+            raise serializers.ValidationError(message)
+
+        return queryset.first()
+
+    class Meta:
+        model = BusinessConnect
+        fields = [
+            "id",
+            "dentist",
+            "laboratory",
+            "is_active",
+            "connect_id",
+        ]
+        read_only_fields = ["dentist", "laboratory", "is_active"]
+
+    def create(self, validated_data):
+
+        connect = validated_data["connect_id"]
+        connect.is_active = False if connect.is_active else True
+        connect.save()
+
+        return connect
