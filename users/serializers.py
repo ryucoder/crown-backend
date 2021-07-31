@@ -596,23 +596,23 @@ class CreateRelatedBusinessSerializer(serializers.ModelSerializer):
 
 
 class ConnectRelatedBusinessSerializer(serializers.ModelSerializer):
-    connect_id = serializers.UUIDField(
+    business_id = serializers.UUIDField(
         write_only=True,
         error_messages=CUSTOM_ERROR_MESSAGES["UUIDField"],
     )
 
-    def validate_connect_id(self, connect_id):
+    def validate_business_id(self, business_id):
         user = self.context["user"]
 
         user_business = user.get_business()
-        business = Business.objects.filter(id=connect_id).first()
+        business = Business.objects.filter(id=business_id).first()
 
         if business is None:
-            message = "server_absent_connect_id"
+            message = "server_absent_business_id"
             raise serializers.ValidationError(message)
 
         if user_business.category == business.category:
-            message = "server_invalid_connect_id"
+            message = "server_invalid_business_id"
             raise serializers.ValidationError(message)
 
         if user_business.category == "dentist":
@@ -637,9 +637,10 @@ class ConnectRelatedBusinessSerializer(serializers.ModelSerializer):
             "id",
             "dentist",
             "laboratory",
-            "connect_id",
+            "is_active",
+            "business_id",
         ]
-        read_only_fields = ["dentist", "laboratory"]
+        read_only_fields = ["dentist", "laboratory", "is_active"]
 
     def create(self, validated_data):
 
@@ -647,7 +648,7 @@ class ConnectRelatedBusinessSerializer(serializers.ModelSerializer):
 
         connect = BusinessConnect()
         users_business = user.get_business()
-        related_business = validated_data["connect_id"]
+        related_business = validated_data["business_id"]
 
         if users_business.category == "dentist":
             connect.dentist = users_business
