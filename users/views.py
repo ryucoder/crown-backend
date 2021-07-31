@@ -225,6 +225,4 @@ class RegisteredEmailUserViewset(viewsets.ModelViewSet):
 
         instance = serializer.save()
 
-        # serializer = serializers.EmailUserWithBusinessSerializer(instance=instance)
-
         return Response(serializer.data, status=status.HTTP_201_CREATED)
