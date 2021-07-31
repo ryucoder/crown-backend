@@ -17,12 +17,12 @@ print(ENVIRONMENT)
 print()
 
 
-sentry_sdk.init(
-    dsn="https://f14bd43a38d649eb9905aaaf441a07b1@o484748.ingest.sentry.io/5622732",
-    integrations=[DjangoIntegration()],
-    traces_sample_rate=1.0,
-    environment=ENVIRONMENT,
-    # If you wish to associate users to errors (assuming you are using
-    # django.contrib.auth) you may enable sending PII data.
-    send_default_pii=True,
-)
+# sentry_sdk.init(
+#     dsn="https://f14bd43a38d649eb9905aaaf441a07b1@o484748.ingest.sentry.io/5622732",
+#     integrations=[DjangoIntegration()],
+#     traces_sample_rate=1.0,
+#     environment=ENVIRONMENT,
+#     # If you wish to associate users to errors (assuming you are using
+#     # django.contrib.auth) you may enable sending PII data.
+#     send_default_pii=True,
+# )
