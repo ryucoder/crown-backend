@@ -1,9 +1,10 @@
 import uuid
+import random
 
 from users.models import PasswordToken
 
 
-class PasswordUtil:
+class TokenUtil:
     @staticmethod
     def get_unique_password_token(email_user):
 
@@ -19,3 +20,8 @@ class PasswordUtil:
                 unique_found = True
 
         return current_token
+
+    @staticmethod
+    def get_mobile_token():
+        mobile_token = str(random.randint(100000, 999999))
+        return mobile_token

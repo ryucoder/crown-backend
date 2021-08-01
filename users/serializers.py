@@ -1,7 +1,6 @@
-import random
 import uuid
 
-from businesses.models import Business, BusinessConnect
+from businesses.models import Business, BusinessConnect, BusinessEmployee
 from businesses.serializers import BusinessOnlySerializer
 from core.serializers import ServerErrorSerializer
 from core.utils import EmailUtil, TimeUtil
@@ -11,6 +10,7 @@ from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
+from users.utils import TokenUtil
 from users.constants import (
     CUSTOM_ERROR_MESSAGES,
     DEFAULT_USER_PASSWORD,
@@ -409,7 +409,7 @@ class MobileTokenSerializer(serializers.ModelSerializer):
         instance = MobileToken()
         instance.email_user = email_user
         instance.mobile = email_user.mobile
-        instance.token = str(random.randint(100000, 999999))
+        instance.token = TokenUtil.get_mobile_token()
         instance.expiry = TimeUtil.get_minutes_from_now(MOBILE_TOKEN_EXPIRY_MINUTES)
         instance.is_used = False
 
@@ -697,3 +697,133 @@ class ToggleBusinessConnectSerializer(serializers.ModelSerializer):
         connect.save()
 
         return connect
+
+
+class BusinessEmployeeSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(
+        max_length=255,
+        required=True,
+        error_messages=CUSTOM_ERROR_MESSAGES["CharField"],
+    )
+    last_name = serializers.CharField(
+        max_length=255,
+        required=True,
+        error_messages=CUSTOM_ERROR_MESSAGES["CharField"],
+    )
+    password_one = serializers.CharField(
+        min_length=9,
+        max_length=18,
+        write_only=True,
+        error_messages=CUSTOM_ERROR_MESSAGES["CharField"],
+    )
+    password_two = serializers.CharField(
+        min_length=9,
+        max_length=18,
+        write_only=True,
+        error_messages=CUSTOM_ERROR_MESSAGES["CharField"],
+    )
+    email = serializers.EmailField(
+        max_length=255,
+        error_messages=CUSTOM_ERROR_MESSAGES["EmailField"],
+        validators=[
+            UniqueValidator(
+                queryset=EmailUser.objects.all(), message="server_exists_already"
+            )
+        ],
+    )
+    mobile = serializers.CharField(
+        min_length=10,
+        max_length=10,
+        required=False,
+        error_messages=CUSTOM_ERROR_MESSAGES["CharField"],
+    )
+
+    def validate_email(self, email):
+        email = email.strip().lower()
+        queryset = EmailUser.objects.filter(email__iexact=email)
+
+        if queryset.exists():
+            message = "server_exists_already"
+            raise serializers.ValidationError(message)
+
+        return email
+
+    def validate_password_two(self, password_two):
+        password_one = self.initial_data.get("password_one")
+
+        if password_one != password_two:
+            message = "server_passwords_not_match"
+            raise serializers.ValidationError(message)
+
+        return password_two
+
+    def validate_mobile(self, mobile):
+
+        if not mobile.isnumeric():
+            message = "server_must_be_numeric"
+            raise serializers.ValidationError(message)
+
+        return mobile
+
+    class Meta:
+        model = EmailUser
+        fields = [
+            "password_one",
+            "password_two",
+            "id",
+            "first_name",
+            "last_name",
+            "email",
+            "is_email_verified",
+            "mobile",
+            "is_mobile_verified",
+        ]
+        read_only_fields = ["is_email_verified", "is_mobile_verified"]
+
+    def create(self, validated_data):
+        user = self.context["user"]
+        password_one = validated_data.pop("password_one")
+        password_two = validated_data.pop("password_two")
+
+        employee = EmailUser(**validated_data)
+        employee.password = make_password(password_one)
+        employee.user_type = "employee"
+        employee.is_email_verified = False
+        employee.is_mobile_verified = False
+
+        # Business
+        employment = BusinessEmployee()
+        employment.business = user.get_business()
+        employment.employee = employee
+
+        # EMAIL TOKEN
+        email_token = PasswordToken()
+        email_token.email_user = employee
+        email_token.token = uuid.uuid4()
+        email_token.category = "signup"
+        email_token.is_used = False
+        email_token.expiry = TimeUtil.get_minutes_from_now(SIGNUP_TOKEN_EXPIRY_MINUTES)
+
+        # Mobile TOKEN
+        mobile = validated_data.get("mobile", None)
+        if mobile:
+            mobile_token = MobileToken()
+            mobile_token.email_user = employee
+            mobile_token.mobile = employee.mobile
+            mobile_token.token = TokenUtil.get_mobile_token()
+            mobile_token.expiry = TimeUtil.get_minutes_from_now(
+                MOBILE_TOKEN_EXPIRY_MINUTES
+            )
+            mobile_token.is_used = False
+
+        with transaction.atomic():
+            employee.save()
+            employment.save()
+            email_token.save()
+
+            if mobile:
+                mobile_token.save()
+
+        # EmailUtil.send_signup_email(instance, email_token)
+
+        return employee

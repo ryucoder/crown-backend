@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from users import serializers
 from users.constants import RESET_PASSWORD_TOKEN_EXPIRY_MINUTES
 from users.models import EmailUser, PasswordToken
-from users.utils import PasswordUtil
+from users.utils import TokenUtil
 
 # from rest_framework_simplejwt.authentication import (
 #     JWTAuthentication,
@@ -113,7 +113,7 @@ class EmailUserViewset(RetrieveModelMixin, viewsets.GenericViewSet):
 
         verification_token = PasswordToken()
         verification_token.email_user = email_user
-        verification_token.token = PasswordUtil.get_unique_password_token(email_user)
+        verification_token.token = TokenUtil.get_unique_password_token(email_user)
         verification_token.expiry = TimeUtil.get_minutes_from_now(
             RESET_PASSWORD_TOKEN_EXPIRY_MINUTES
         )
@@ -236,3 +236,15 @@ class RegisteredEmailUserViewset(viewsets.ModelViewSet):
         instance = serializer.save()
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=["post"])
+    def create_business_employee(self, request, *args, **kwargs):
+        user = EmailUser.objects.filter(id=request.user.pk).first()
+        serializer = serializers.BusinessEmployeeSerializer(
+            data=request.data, context={"user": user}
+        )
+        serializer.is_valid(raise_exception=True)
+
+        instance = serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
