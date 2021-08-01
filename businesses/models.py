@@ -1,5 +1,5 @@
 from core.models import PrimaryUUIDTimeStampedModel
-from django.db import models, transaction
+from django.db import models
 
 from businesses.constants import CATEGORY_CHOICES, ORDER_STATUS_CHOICES
 
