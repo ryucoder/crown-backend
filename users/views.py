@@ -6,7 +6,7 @@ from rest_framework.response import Response
 
 from users import serializers
 from users.constants import RESET_PASSWORD_TOKEN_EXPIRY_MINUTES
-from users.models import EmailUser, PasswordToken
+from users.models import EmailUser, EmailToken
 from users.utils import TokenUtil
 
 # from rest_framework_simplejwt.authentication import (
@@ -111,7 +111,7 @@ class EmailUserViewset(RetrieveModelMixin, viewsets.GenericViewSet):
 
         email_user = serializer.validated_data["email"]
 
-        verification_token = PasswordToken()
+        verification_token = EmailToken()
         verification_token.email_user = email_user
         verification_token.token = TokenUtil.get_unique_password_token(email_user)
         verification_token.expiry = TimeUtil.get_minutes_from_now(

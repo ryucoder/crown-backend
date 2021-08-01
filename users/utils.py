@@ -1,7 +1,7 @@
 import uuid
 import random
 
-from users.models import PasswordToken
+from users.models import EmailToken
 
 
 class TokenUtil:
@@ -9,7 +9,7 @@ class TokenUtil:
     def get_unique_password_token(email_user):
 
         unique_found = False
-        all_tokens = PasswordToken.objects.filter(email_user=email_user).values_list(
+        all_tokens = EmailToken.objects.filter(email_user=email_user).values_list(
             "token", flat=True
         )
 

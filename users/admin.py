@@ -11,7 +11,7 @@ admin.site.site_header = "Crown Admin Panel"
 
 from users.models import (
     EmailUser,
-    PasswordToken,
+    EmailToken,
     MobileToken,
 )
 
@@ -41,7 +41,7 @@ class MobileTokenAdmin(admin.ModelAdmin):
     list_per_page = 25
 
 
-@admin.register(PasswordToken)
+@admin.register(EmailToken)
 class PasswordTokenAdmin(admin.ModelAdmin):
     def is_expired(self, obj):
         return timezone.now() > obj.expiry
@@ -77,7 +77,7 @@ class PasswordTokenAdmin(admin.ModelAdmin):
     ]
 
     class Meta:
-        model = PasswordToken
+        model = EmailToken
 
     list_per_page = 25
 

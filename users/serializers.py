@@ -17,7 +17,7 @@ from users.constants import (
     MOBILE_TOKEN_EXPIRY_MINUTES,
     SIGNUP_TOKEN_EXPIRY_MINUTES,
 )
-from users.models import EmailUser, MobileToken, PasswordToken
+from users.models import EmailUser, MobileToken, EmailToken
 
 
 class LoginSerializer(serializers.Serializer):
@@ -174,7 +174,7 @@ class LaboratorySignUpSerializer(serializers.ModelSerializer):
         instance.is_email_verified = False
 
         # EMAIL TOKEN
-        verification_token = PasswordToken()
+        verification_token = EmailToken()
         verification_token.email_user = instance
         verification_token.token = uuid.uuid4()
         verification_token.category = "signup"
@@ -223,9 +223,9 @@ class LaboratoryVerifySignUpSerializer(serializers.Serializer):
 
         email = self.initial_data["email"].strip().lower()
 
-        queryset = PasswordToken.objects.filter(
-            token=token, category="signup"
-        ).order_by("-created_at")
+        queryset = EmailToken.objects.filter(token=token, category="signup").order_by(
+            "-created_at"
+        )
 
         if not queryset.exists():
             # NOTE: message should be server_absent, but for this endpoint server_invalid is chosen
@@ -248,7 +248,7 @@ class LaboratoryVerifySignUpSerializer(serializers.Serializer):
         email_user = data["email"]
         token_object = data["token"]
 
-        queryset = PasswordToken.objects.filter(
+        queryset = EmailToken.objects.filter(
             email_user_id=email_user.id, token=token_object.token, category="signup"
         ).order_by("-created_at")
 
@@ -284,7 +284,7 @@ class RequestPasswordResetSerializer(serializers.Serializer):
 
         email_user = data["email"]
 
-        user_tokens = PasswordToken.objects.order_by("-created_at").filter(
+        user_tokens = EmailToken.objects.order_by("-created_at").filter(
             email_user=email_user, category="reset"
         )
 
@@ -327,7 +327,7 @@ class ResetPasswordSerializer(serializers.Serializer):
         # token = self.initial_data["token"].strip()
 
         # TODO: same sql is being run twice, need a fix for this.
-        queryset = PasswordToken.objects.filter(email_user__email=email).order_by(
+        queryset = EmailToken.objects.filter(email_user__email=email).order_by(
             "-created_at"
         )
 
@@ -342,7 +342,7 @@ class ResetPasswordSerializer(serializers.Serializer):
         email = self.initial_data["email"].strip().lower()
 
         # TODO: same sql is being run twice, need a fix for this.
-        queryset = PasswordToken.objects.filter(
+        queryset = EmailToken.objects.filter(
             email_user__email=email, token=token
         ).order_by("-created_at")
 
@@ -548,7 +548,7 @@ class CreateRelatedBusinessSerializer(serializers.ModelSerializer):
         instance.is_mobile_verified = False
 
         # # EMAIL TOKEN
-        # verification_token = PasswordToken()
+        # verification_token = EmailToken()
         # verification_token.email_user = instance
         # verification_token.token = uuid.uuid4()
         # verification_token.category = "signup"
@@ -797,7 +797,7 @@ class BusinessEmployeeSerializer(serializers.ModelSerializer):
         employment.employee = employee
 
         # EMAIL TOKEN
-        email_token = PasswordToken()
+        email_token = EmailToken()
         email_token.email_user = employee
         email_token.token = uuid.uuid4()
         email_token.category = "signup"

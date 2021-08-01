@@ -6,7 +6,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from core.models import PrimaryUUIDTimeStampedModel
 
-from users.constants import USER_TYPE_CHOICES, PASSWORD_CATEGORY_CHOICES
+from users.constants import USER_TYPE_CHOICES, EMAIL_TOKEN_CATEGORY_CHOICES
 from users.managers import UserManager
 
 
@@ -70,7 +70,7 @@ class EmailUser(PrimaryUUIDTimeStampedModel, AbstractUser):
         verbose_name_plural = "Email Users"
 
 
-class PasswordToken(PrimaryUUIDTimeStampedModel):
+class EmailToken(PrimaryUUIDTimeStampedModel):
 
     email_user = models.ForeignKey(
         "users.EmailUser",
@@ -81,7 +81,7 @@ class PasswordToken(PrimaryUUIDTimeStampedModel):
     expiry = models.DateTimeField()
     is_used = models.BooleanField(default=False)
     category = models.CharField(
-        max_length=6, choices=PASSWORD_CATEGORY_CHOICES, default="signup"
+        max_length=6, choices=EMAIL_TOKEN_CATEGORY_CHOICES, default="signup"
     )
 
     used_time = models.DateTimeField(null=True, blank=True)

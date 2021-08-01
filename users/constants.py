@@ -4,7 +4,7 @@ USER_TYPE_CHOICES = [
     ("employee", "employee"),
 ]
 
-PASSWORD_CATEGORY_CHOICES = [
+EMAIL_TOKEN_CATEGORY_CHOICES = [
     ("signup", "signup"),
     ("reset", "reset"),
 ]
