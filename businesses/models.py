@@ -122,7 +122,7 @@ class BusinessAccount(PrimaryUUIDTimeStampedModel):
         ("savings", "savings"),
     ]
     account_name = models.CharField(max_length=255)
-    account_number = models.CharField(max_length=255)
+    account_number = models.IntegerField()
     bank_name = models.CharField(max_length=255)
     ifsc_code = models.CharField(max_length=11)
     account_type = models.CharField(

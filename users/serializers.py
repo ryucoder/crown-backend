@@ -1,6 +1,11 @@
 import uuid
 
-from businesses.models import Business, BusinessConnect, BusinessEmployee
+from businesses.models import (
+    Business,
+    BusinessConnect,
+    BusinessEmployee,
+    BusinessAccount,
+)
 from businesses.serializers import BusinessOnlySerializer
 from core.serializers import ServerErrorSerializer
 from core.utils import EmailUtil, TimeUtil
@@ -827,3 +832,19 @@ class BusinessEmployeeSerializer(serializers.ModelSerializer):
         # EmailUtil.send_signup_email(instance, email_token)
 
         return employee
+
+
+class BusinessAccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BusinessAccount
+        fields = [
+            "id",
+            "account_name",
+            "account_number",
+            "bank_name",
+            "ifsc_code",
+            "account_type",
+            "business",
+            "is_default",
+        ]
+        read_only_fields = ["business"]
