@@ -27,8 +27,51 @@ class BusinessAccountSerializer(serializers.ModelSerializer):
             "bank_name",
             "ifsc_code",
             "account_type",
+            "is_default",
             "business",
         ]
+        read_only_fields = ["business"]
+
+    def create(self, validated_data):
+        user = validated_data.pop("user")
+
+        instance = BusinessAccount(**validated_data)
+        instance.business = user.get_business()
+        instance.save()
+
+        is_default = validated_data["is_default"]
+
+        if is_default:
+            queryset = user.get_business().accounts.exclude(id=instance.id)
+            queryset.update(is_default=False)
+
+        return instance
+
+    def update(self, instance, validated_data):
+
+        instance.account_name = validated_data.get(
+            "account_name", instance.account_name
+        )
+        instance.account_number = validated_data.get(
+            "account_number", instance.account_number
+        )
+        instance.bank_name = validated_data.get("bank_name", instance.bank_name)
+        instance.ifsc_code = validated_data.get("ifsc_code", instance.ifsc_code)
+        instance.account_type = validated_data.get(
+            "account_type", instance.account_type
+        )
+        instance.is_default = validated_data.get("is_default", instance.is_default)
+        instance.save()
+
+        is_default = validated_data["is_default"]
+
+        if is_default:
+            queryset = BusinessAccount.objects.filter(
+                business_id=instance.business_id
+            ).exclude(id=instance.id)
+            queryset.update(is_default=False)
+
+        return instance
 
 
 class BusinessAddressSerializer(serializers.ModelSerializer):
