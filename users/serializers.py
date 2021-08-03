@@ -612,11 +612,11 @@ class ConnectRelatedBusinessSerializer(serializers.ModelSerializer):
         business = Business.objects.filter(id=business_id).first()
 
         if business is None:
-            message = "server_absent_business_id"
+            message = "server_absent"
             raise serializers.ValidationError(message)
 
         if user_business.category == business.category:
-            message = "server_invalid_business_id"
+            message = "server_invalid"
             raise serializers.ValidationError(message)
 
         if user_business.category == "dentist":
@@ -678,7 +678,7 @@ class ToggleBusinessConnectSerializer(serializers.ModelSerializer):
 
         queryset = BusinessConnect.objects.filter(id=connect_id)
         if not queryset.exists():
-            message = "server_absent_connect_id"
+            message = "server_absent"
             raise serializers.ValidationError(message)
 
         return queryset.first()

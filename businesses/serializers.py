@@ -2,8 +2,12 @@ from django.db import transaction
 
 from rest_framework import serializers
 
-from core.serializers import ServerErrorSerializer, OrderOptionSerializer
-from core.models import OrderOption
+from core.serializers import (
+    ServerErrorSerializer,
+    ServerErrorModelSerializer,
+    OrderOptionSerializer,
+)
+from core.models import OrderOption, State
 
 from users.models import EmailUser
 
@@ -74,10 +78,37 @@ class BusinessAccountSerializer(serializers.ModelSerializer):
         return instance
 
 
-class BusinessAddressSerializer(serializers.ModelSerializer):
+class BusinessAddressSerializer(ServerErrorModelSerializer):
+    state_id = serializers.UUIDField(write_only=True)
+
+    def validate_state_id(self, state_id):
+        queryset = State.objects.filter(id=state_id)
+
+        if not queryset.exists():
+            message = "server_absent"
+            raise serializers.ValidationError(message)
+
+        return queryset.first()
+
+    def validate_address_type(self, address_type):
+        all_addresses = self.context["user"].get_business().addresses.all()
+
+        if all_addresses.count() == 0 and address_type != "headquarters":
+            message = "server_headquarter_must_exist"
+            raise serializers.ValidationError(message)
+
+        queryset = all_addresses.filter(address_type="headquarters")
+
+        if address_type == "headquarters" and queryset.exists():
+            message = "server_headquarter_already_exists"
+            raise serializers.ValidationError(message)
+
+        return address_type
+
     class Meta:
         model = BusinessAddress
         fields = [
+            "state_id",
             "id",
             "name",
             "address",
@@ -86,7 +117,56 @@ class BusinessAddressSerializer(serializers.ModelSerializer):
             "address_type",
             "business",
             "state",
+            "is_default",
+            "created_at",
+            "modified_at",
         ]
+        read_only_fields = ["business", "state", "created_at", "modified_at"]
+
+    def create(self, validated_data):
+        user = self.context["user"]
+        state = validated_data.pop("state_id")
+
+        is_default = validated_data["is_default"]
+        is_default = is_default if user.get_business().addresses.count() > 0 else True
+
+        instance = BusinessAddress(**validated_data)
+        instance.business = user.get_business()
+        instance.state = state
+        instance.is_default = is_default
+        instance.save()
+
+        if is_default:
+            queryset = user.get_business().addresses.exclude(id=instance.id)
+            queryset.update(is_default=False)
+
+        return instance
+
+    # def update(self, instance, validated_data):
+
+    #     instance.account_name = validated_data.get(
+    #         "account_name", instance.account_name
+    #     )
+    #     instance.account_number = validated_data.get(
+    #         "account_number", instance.account_number
+    #     )
+    #     instance.bank_name = validated_data.get("bank_name", instance.bank_name)
+    #     instance.ifsc_code = validated_data.get("ifsc_code", instance.ifsc_code)
+    #     instance.account_type = validated_data.get(
+    #         "account_type", instance.account_type
+    #     )
+    #     instance.is_default = validated_data.get("is_default", instance.is_default)
+    #     instance.save()
+
+    #     is_default = validated_data["is_default"]
+
+    #     if is_default:
+    #         queryset = BusinessAccount.objects.filter(
+    #             business_id=instance.business_id
+    #         ).exclude(id=instance.id)
+    #         queryset.update(is_default=False)
+
+    #     return instance
 
 
 class BusinessContactSerializer(serializers.ModelSerializer):

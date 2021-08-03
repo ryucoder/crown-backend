@@ -11,9 +11,10 @@ from users.models import EmailUser
 from businesses.serializers import (
     BusinessSerializer,
     BusinessAccountSerializer,
+    BusinessAddressSerializer,
     OrderSerializer,
 )
-from businesses.models import Business, BusinessAccount, Order
+from businesses.models import Business, BusinessAccount, BusinessAddress, Order
 
 
 class BusinessViewset(viewsets.ModelViewSet):
@@ -69,3 +70,37 @@ class BusinessAccountViewset(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         user = EmailUser.objects.filter(id=self.request.user.pk).first()
         serializer.save(user=user)
+
+
+class BusinessAddressViewset(viewsets.ModelViewSet):
+
+    serializer_class = BusinessAddressSerializer
+    # pagination_class = CurrentPagePagination
+    authentication_classes = CommonUtil.get_authentication_classes()
+
+    def get_permissions(self):
+        # For add, edit and delete business_address
+        #   only owner
+
+        return super().get_permissions()
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["user"] = (
+            EmailUser.objects.filter(id=self.request.user.pk)
+            .select_related("business")
+            .prefetch_related("business__addresses")
+            .first()
+        )
+        return context
+
+    def get_queryset(self):
+        user = (
+            EmailUser.objects.filter(id=self.request.user.pk)
+            .select_related("business")
+            .prefetch_related("business__addresses")
+            .first()
+        )
+        # queryset = BusinessAddress.objects.filter(business=user.get_business())
+        queryset = user.business.addresses.all()
+        return queryset
