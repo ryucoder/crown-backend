@@ -193,7 +193,11 @@ class ToggleDefaultBusinessAddressSerializer(ServerErrorModelSerializer):
 
 class BusinessContactSerializer(ServerErrorModelSerializer):
     def validate_contact(self, contact):
-        contact_type = self.initial_data.get("contact_type")
+        contact_type = self.initial_data.get("contact_type", None)
+
+        if contact_type == None:
+            message = "server_contact_type_none"
+            raise serializers.ValidationError(message)
 
         if contact_type == "landline":
             length = len(str(contact).strip())
@@ -251,28 +255,14 @@ class BusinessContactSerializer(ServerErrorModelSerializer):
 
         return instance
 
-    # def update(self, instance, validated_data):
+    def update(self, instance, validated_data):
 
-    #     instance.name = validated_data.get("name", instance.name)
-    #     instance.address = validated_data.get("address", instance.address)
-    #     instance.city = validated_data.get("city", instance.city)
-    #     instance.pincode = validated_data.get("pincode", instance.pincode)
-    #     instance.address_type = validated_data.get(
-    #         "address_type", instance.address_type
-    #     )
-    #     instance.state = validated_data.get("state_id", instance.state)
-    #     instance.is_default = validated_data.get("is_default", instance.is_default)
-    #     instance.save()
-
-    #     is_default = validated_data["is_default"]
-
-    #     if is_default:
-    #         queryset = BusinessAddress.objects.filter(
-    #             business_id=instance.business_id
-    #         ).exclude(id=instance.id)
-    #         queryset.update(is_default=False)
-
-    #     return instance
+        instance.contact = validated_data.get("contact", instance.contact)
+        instance.contact_type = validated_data.get(
+            "contact_type", instance.contact_type
+        )
+        instance.save()
+        return instance
 
 
 class BusinessSerializer(ServerErrorSerializer):
