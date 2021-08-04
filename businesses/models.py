@@ -193,7 +193,7 @@ class Order(PrimaryUUIDTimeStampedModel):
 
     referrer = models.CharField(max_length=255, null=True, blank=True)
 
-    delivery_date = models.DateTimeField()
+    delivery_date = models.DateTimeField(null=True, blank=True)
 
     notes = models.TextField(null=True, blank=True)
 

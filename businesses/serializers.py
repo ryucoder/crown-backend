@@ -416,7 +416,7 @@ class OrderSerializer(serializers.ModelSerializer):
         instance.to_laboratory = to_laboratory
         instance.to_user = to_laboratory.owner
         instance.from_user_id = self.context["user"].id
-        instance.from_business = self.context["user"].get_business()
+        instance.from_dentist = self.context["user"].get_business()
 
         order_status = OrderStatus()
         order_status.order = instance

@@ -37,6 +37,23 @@ class OrderViewset(viewsets.ModelViewSet):
     pagination_class = CurrentPagePagination
     authentication_classes = CommonUtil.get_authentication_classes()
 
+    def get_permissions(self):
+
+        # dentist users
+        # create    - only denstists or his employees can create accounts
+        # read      - dentist owner can view all orders, dentist employee can view orders created by him
+        # update    - dentist can update all order if they arein certain statuses
+        # delete    - dentist users can delete orders that are having status of pending
+
+        # laboratory users
+        # create    - cant create orders
+        # read      - laboratory owner can view all orders, laboratory employee can view his orders
+        # update    - laboratory owner can update the status of all orders,
+        #             laboratory employee can update the status of his orders,
+        # delete    - laboratory users cant delete any orders
+
+        return super().get_permissions()
+
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context["user"] = (
