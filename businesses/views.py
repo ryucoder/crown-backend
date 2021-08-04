@@ -12,6 +12,7 @@ from businesses.serializers import (
     BusinessSerializer,
     BusinessAccountSerializer,
     BusinessAddressSerializer,
+    ToggleDefaultBusinessAddressSerializer,
     OrderSerializer,
 )
 from businesses.models import Business, BusinessAccount, BusinessAddress, Order
@@ -104,3 +105,18 @@ class BusinessAddressViewset(viewsets.ModelViewSet):
         # queryset = BusinessAddress.objects.filter(business=user.get_business())
         queryset = user.business.addresses.all()
         return queryset
+
+    @action(detail=True, methods=["put"])
+    def toggle_is_default(self, request, *args, **kwargs):
+
+        instance = self.get_object()
+        serializer = ToggleDefaultBusinessAddressSerializer(
+            instance, data=request.data, partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+
+        instance = serializer.save()
+
+        serializer = BusinessAddressSerializer(instance=instance)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

@@ -166,6 +166,30 @@ class BusinessAddressSerializer(ServerErrorModelSerializer):
         return instance
 
 
+class ToggleDefaultBusinessAddressSerializer(ServerErrorModelSerializer):
+    class Meta:
+        model = BusinessAddress
+        fields = [
+            "id",
+            "is_default",
+        ]
+        read_only_fields = ["is_default"]
+
+    def update(self, instance, validated_data):
+
+        instance.is_default = True if instance.is_default == False else False
+
+        all_other_addresses = BusinessAddress.objects.filter(
+            business_id=instance.business_id
+        ).exclude(id=instance.id)
+
+        with transaction.atomic():
+            instance.save()
+            all_other_addresses.update(is_default=False)
+
+        return instance
+
+
 class BusinessContactSerializer(serializers.ModelSerializer):
     class Meta:
         model = BusinessContact
