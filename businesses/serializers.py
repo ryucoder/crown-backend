@@ -305,28 +305,9 @@ class OrderSerializer(serializers.ModelSerializer):
 
     options_ids = serializers.ListField(child=serializers.UUIDField(), write_only=True)
 
-    to_business_id = serializers.UUIDField(write_only=True)
+    to_laboratory_id = serializers.UUIDField(write_only=True)
 
     # to_user_id = serializers.UUIDField(write_only=True)
-    # def validate_to_user_id(self, to_user_id):
-
-    #     queryset = EmailUser.objects.filter(id=to_user_id)
-
-    #     if not queryset.exists():
-    #         message = "server_absent_to_user_id"
-    #         raise serializers.ValidationError(message)
-
-    #     return queryset.first()
-
-    def validate_to_business_id(self, to_business_id):
-
-        queryset = Business.objects.filter(id=to_business_id)
-
-        if not queryset.exists():
-            message = "server_absent_to_business_id"
-            raise serializers.ValidationError(message)
-
-        return queryset.first()
 
     def validate_options_ids(self, options_ids):
 
@@ -338,6 +319,26 @@ class OrderSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(message)
 
         return options_ids
+
+    def validate_to_laboratory_id(self, to_laboratory_id):
+
+        queryset = Business.objects.filter(id=to_laboratory_id)
+
+        if not queryset.exists():
+            message = "server_absent_to_laboratory_id"
+            raise serializers.ValidationError(message)
+
+        return queryset.first()
+
+    # def validate_to_user_id(self, to_user_id):
+
+    #     queryset = EmailUser.objects.filter(id=to_user_id)
+
+    #     if not queryset.exists():
+    #         message = "server_absent_to_user_id"
+    #         raise serializers.ValidationError(message)
+
+    #     return queryset.first()
 
     def validate_teeth(self, teeth):
 
@@ -377,7 +378,7 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = [
             # "to_user_id",
-            "to_business_id",
+            "to_laboratory_id",
             "options_ids",
             "id",
             "doctor_name",
@@ -391,37 +392,36 @@ class OrderSerializer(serializers.ModelSerializer):
             "is_active",
             "teeth",
             "latest_status",
-            "from_business",
+            "from_dentist",
             "from_user",
-            "to_business",
+            "to_laboratory",
             "to_user",
         ]
         read_only_fields = [
             "from_user",
             "to_user",
-            "from_business",
-            "to_business",
+            "from_dentist",
+            "to_laboratory",
             "latest_status",
         ]
 
     def create(self, validated_data):
         options_ids = validated_data.pop("options_ids")
-        to_business = validated_data.pop("to_business_id")
-        from_user_id = validated_data.pop("from_user_id")
+        to_laboratory = validated_data.pop("to_laboratory_id")
 
         options = OrderOption.objects.filter(id__in=options_ids)
 
         instance = Order(**validated_data)
         instance.latest_status = "pending"
-        instance.to_business = to_business
-        instance.to_user = to_business.owner
-        instance.from_user_id = from_user_id
-        instance.from_business = EmailUser.objects.get(id=from_user_id).get_business()
+        instance.to_laboratory = to_laboratory
+        instance.to_user = to_laboratory.owner
+        instance.from_user_id = self.context["user"].id
+        instance.from_business = self.context["user"].get_business()
 
         order_status = OrderStatus()
         order_status.order = instance
         order_status.status = instance.latest_status
-        order_status.user_id = from_user_id
+        order_status.user_id = self.context["user"].id
 
         with transaction.atomic():
             instance.save()

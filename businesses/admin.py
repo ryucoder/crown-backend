@@ -19,15 +19,14 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = [
         "is_urgent",
         "is_active",
-        "from_business",
-        "to_business",
+        "latest_status",
     ]
 
     list_display = [
         "id",
-        "from_business",
+        "from_dentist",
         "from_user",
-        "to_business",
+        "to_laboratory",
         "to_user",
         "latest_status",
         "is_urgent",
