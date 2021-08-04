@@ -327,7 +327,6 @@ class OrderSerializer(ServerErrorModelSerializer):
 
         # Condition 1
         queryset = Business.objects.filter(id=to_laboratory_id).prefetch_related(
-            # "laboratories",
             Prefetch(
                 "laboratories", queryset=BusinessConnect.objects.filter(is_active=True)
             ),
@@ -338,11 +337,6 @@ class OrderSerializer(ServerErrorModelSerializer):
             raise serializers.ValidationError(message)
 
         # Condition 2
-        users_business = self.context["user"].get_business()
-
-        # connect_ids = BusinessConnect.objects.filter(
-        #     dentist=users_business, is_active=True
-        # ).values_list("laboratory_id", flat=True)
         connect_ids = queryset.first().laboratories.values_list(
             "laboratory_id", flat=True
         )
