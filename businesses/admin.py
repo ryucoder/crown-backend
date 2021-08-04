@@ -10,8 +10,6 @@ from businesses.models import (
     OrderStatus,
 )
 
-from core.models import State
-
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
