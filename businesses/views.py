@@ -12,10 +12,11 @@ from businesses.serializers import (
     BusinessSerializer,
     BusinessAccountSerializer,
     BusinessAddressSerializer,
+    BusinessContactSerializer,
     ToggleDefaultBusinessAddressSerializer,
     OrderSerializer,
 )
-from businesses.models import Business, BusinessAccount, BusinessAddress, Order
+from businesses.models import Business, BusinessAccount, BusinessContact, Order
 
 
 class BusinessViewset(viewsets.ModelViewSet):
@@ -102,7 +103,6 @@ class BusinessAddressViewset(viewsets.ModelViewSet):
             .prefetch_related("business__addresses")
             .first()
         )
-        # queryset = BusinessAddress.objects.filter(business=user.get_business())
         queryset = user.business.addresses.all()
         return queryset
 
@@ -120,3 +120,37 @@ class BusinessAddressViewset(viewsets.ModelViewSet):
         serializer = BusinessAddressSerializer(instance=instance)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class BusinessContactViewset(viewsets.ModelViewSet):
+
+    serializer_class = BusinessContactSerializer
+    # pagination_class = CurrentPagePagination
+    authentication_classes = CommonUtil.get_authentication_classes()
+
+    def get_permissions(self):
+        # For add, edit and delete business_address
+        #   only owner
+
+        return super().get_permissions()
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["user"] = (
+            EmailUser.objects.filter(id=self.request.user.pk)
+            .select_related("business")
+            .prefetch_related("business__contacts")
+            .first()
+        )
+        return context
+
+    def get_queryset(self):
+        user = (
+            EmailUser.objects.filter(id=self.request.user.pk)
+            .select_related("business")
+            .prefetch_related("business__contacts")
+            .first()
+        )
+        # queryset = BusinessAddress.objects.filter(business=user.get_business())
+        queryset = user.business.contacts.all()
+        return queryset
