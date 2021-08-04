@@ -155,7 +155,7 @@ class BusinessConnect(PrimaryUUIDTimeStampedModel):
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.id} - {self.business} - {self.account_type}"
+        return f"{self.id} - {self.is_active}"
 
     class Meta:
         verbose_name = "Business Connect"

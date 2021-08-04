@@ -4,6 +4,7 @@ from businesses.models import (
     Business,
     BusinessEmployee,
     BusinessContact,
+    BusinessConnect,
     BusinessAddress,
     BusinessAccount,
     Order,
@@ -47,6 +48,23 @@ class OrderStatusAdmin(admin.ModelAdmin):
         "order",
         "status",
         "user",
+        "created_at",
+        "modified_at",
+    ]
+
+    list_per_page = 25
+
+
+@admin.register(BusinessConnect)
+class BusinessConnectAdmin(admin.ModelAdmin):
+
+    list_filter = ["is_active"]
+
+    list_display = [
+        "id",
+        "dentist",
+        "laboratory",
+        "is_active",
         "created_at",
         "modified_at",
     ]

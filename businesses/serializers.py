@@ -1,4 +1,6 @@
 from django.db import transaction
+from django.db.models import Prefetch
+
 from django.core.validators import EmailValidator
 
 from rest_framework import serializers
@@ -17,6 +19,7 @@ from businesses.models import (
     BusinessAccount,
     BusinessAddress,
     BusinessContact,
+    BusinessConnect,
     Order,
     OrderStatus,
 )
@@ -299,7 +302,7 @@ class BusinessOnlySerializer(serializers.ModelSerializer):
         read_only_fields = ["owner"]
 
 
-class OrderSerializer(serializers.ModelSerializer):
+class OrderSerializer(ServerErrorModelSerializer):
 
     options = OrderOptionSerializer(read_only=True, many=True)
 
@@ -322,10 +325,30 @@ class OrderSerializer(serializers.ModelSerializer):
 
     def validate_to_laboratory_id(self, to_laboratory_id):
 
-        queryset = Business.objects.filter(id=to_laboratory_id)
+        # Condition 1
+        queryset = Business.objects.filter(id=to_laboratory_id).prefetch_related(
+            # "laboratories",
+            Prefetch(
+                "laboratories", queryset=BusinessConnect.objects.filter(is_active=True)
+            ),
+        )
 
         if not queryset.exists():
             message = "server_absent_to_laboratory_id"
+            raise serializers.ValidationError(message)
+
+        # Condition 2
+        users_business = self.context["user"].get_business()
+
+        # connect_ids = BusinessConnect.objects.filter(
+        #     dentist=users_business, is_active=True
+        # ).values_list("laboratory_id", flat=True)
+        connect_ids = queryset.first().laboratories.values_list(
+            "laboratory_id", flat=True
+        )
+
+        if to_laboratory_id not in connect_ids:
+            message = "server_to_laboratory_id_not_connected"
             raise serializers.ValidationError(message)
 
         return queryset.first()
