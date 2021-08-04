@@ -142,31 +142,28 @@ class BusinessAddressSerializer(ServerErrorModelSerializer):
 
         return instance
 
-    # def update(self, instance, validated_data):
+    def update(self, instance, validated_data):
 
-    #     instance.account_name = validated_data.get(
-    #         "account_name", instance.account_name
-    #     )
-    #     instance.account_number = validated_data.get(
-    #         "account_number", instance.account_number
-    #     )
-    #     instance.bank_name = validated_data.get("bank_name", instance.bank_name)
-    #     instance.ifsc_code = validated_data.get("ifsc_code", instance.ifsc_code)
-    #     instance.account_type = validated_data.get(
-    #         "account_type", instance.account_type
-    #     )
-    #     instance.is_default = validated_data.get("is_default", instance.is_default)
-    #     instance.save()
+        instance.name = validated_data.get("name", instance.name)
+        instance.address = validated_data.get("address", instance.address)
+        instance.city = validated_data.get("city", instance.city)
+        instance.pincode = validated_data.get("pincode", instance.pincode)
+        instance.address_type = validated_data.get(
+            "address_type", instance.address_type
+        )
+        instance.state = validated_data.get("state_id", instance.state)
+        instance.is_default = validated_data.get("is_default", instance.is_default)
+        instance.save()
 
-    #     is_default = validated_data["is_default"]
+        is_default = validated_data["is_default"]
 
-    #     if is_default:
-    #         queryset = BusinessAccount.objects.filter(
-    #             business_id=instance.business_id
-    #         ).exclude(id=instance.id)
-    #         queryset.update(is_default=False)
+        if is_default:
+            queryset = BusinessAddress.objects.filter(
+                business_id=instance.business_id
+            ).exclude(id=instance.id)
+            queryset.update(is_default=False)
 
-    #     return instance
+        return instance
 
 
 class BusinessContactSerializer(serializers.ModelSerializer):
