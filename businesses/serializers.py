@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.core.validators import EmailValidator
 
 from rest_framework import serializers
 
@@ -191,6 +192,42 @@ class ToggleDefaultBusinessAddressSerializer(ServerErrorModelSerializer):
 
 
 class BusinessContactSerializer(ServerErrorModelSerializer):
+    def validate_contact(self, contact):
+        contact_type = self.initial_data.get("contact_type")
+
+        if contact_type == "landline":
+            length = len(str(contact).strip())
+
+            if length < 11:
+                message = "server_min_length_landline"
+                raise serializers.ValidationError(message)
+
+            if length > 11:
+                message = "server_max_length_landline"
+                raise serializers.ValidationError(message)
+
+        if contact_type == "mobile":
+            length = len(str(contact).strip())
+
+            if length < 10:
+                message = "server_min_length_mobile"
+                raise serializers.ValidationError(message)
+
+            if length > 10:
+                message = "server_max_length_mobile"
+                raise serializers.ValidationError(message)
+
+        if contact_type == "email":
+            validator = EmailValidator(message="server_invalid_email")
+
+            try:
+                validator(contact)
+            except:
+                message = "server_invalid_email"
+                raise serializers.ValidationError(message)
+
+        return contact
+
     class Meta:
         model = BusinessContact
         fields = [
