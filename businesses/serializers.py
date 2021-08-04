@@ -195,6 +195,48 @@ class BusinessContactSerializer(serializers.ModelSerializer):
         model = BusinessContact
         fields = ["id", "business", "contact", "contact_type"]
 
+    def create(self, validated_data):
+        user = self.context["user"]
+        state = validated_data.pop("state_id")
+
+        is_default = validated_data["is_default"]
+        is_default = is_default if user.get_business().addresses.count() > 0 else True
+
+        instance = BusinessAddress(**validated_data)
+        instance.business = user.get_business()
+        instance.state = state
+        instance.is_default = is_default
+        instance.save()
+
+        if is_default:
+            queryset = user.get_business().addresses.exclude(id=instance.id)
+            queryset.update(is_default=False)
+
+        return instance
+
+    def update(self, instance, validated_data):
+
+        instance.name = validated_data.get("name", instance.name)
+        instance.address = validated_data.get("address", instance.address)
+        instance.city = validated_data.get("city", instance.city)
+        instance.pincode = validated_data.get("pincode", instance.pincode)
+        instance.address_type = validated_data.get(
+            "address_type", instance.address_type
+        )
+        instance.state = validated_data.get("state_id", instance.state)
+        instance.is_default = validated_data.get("is_default", instance.is_default)
+        instance.save()
+
+        is_default = validated_data["is_default"]
+
+        if is_default:
+            queryset = BusinessAddress.objects.filter(
+                business_id=instance.business_id
+            ).exclude(id=instance.id)
+            queryset.update(is_default=False)
+
+        return instance
+
 
 class BusinessSerializer(ServerErrorSerializer):
 

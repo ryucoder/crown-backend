@@ -58,7 +58,7 @@ class BusinessEmployee(PrimaryUUIDTimeStampedModel):
 
 
 class BusinessContact(PrimaryUUIDTimeStampedModel):
-    contact_type_choices = (
+    CONTACT_TYPE_CHOICES = (
         ("mobile", "mobile"),
         ("landline", "landline"),
         ("email", "email"),
@@ -70,7 +70,7 @@ class BusinessContact(PrimaryUUIDTimeStampedModel):
 
     contact = models.CharField(max_length=255)
     contact_type = models.CharField(
-        max_length=255, choices=contact_type_choices, default="mobile"
+        max_length=8, choices=CONTACT_TYPE_CHOICES, default="mobile"
     )
 
     is_verified = models.BooleanField(default=False)
