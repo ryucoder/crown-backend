@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from rest_framework import status, viewsets
+from rest_framework import serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -15,6 +15,7 @@ from businesses.serializers import (
     BusinessContactSerializer,
     ToggleDefaultBusinessAddressSerializer,
     OrderSerializer,
+    UpdateOrderStatusSerializer,
 )
 from businesses.models import Business, BusinessAccount, BusinessContact, Order
 
@@ -64,6 +65,14 @@ class OrderViewset(viewsets.ModelViewSet):
         context["action"] = self.action
         return context
 
+    def get_serializer_class(self):
+        serializer = self.serializer_class
+
+        if self.action == "update_order_status":
+            serializer = UpdateOrderStatusSerializer
+
+        return serializer
+
     def get_queryset(self):
 
         user = (
@@ -95,6 +104,18 @@ class OrderViewset(viewsets.ModelViewSet):
         # employee - to_user
 
         return queryset
+
+    @action(detail=True, methods=["put"])
+    def update_order_status(self, request, *args, **kwargs):
+
+        instance = self.get_object()
+
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+
+        instance = serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class BusinessAccountViewset(viewsets.ModelViewSet):

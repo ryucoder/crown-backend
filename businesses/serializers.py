@@ -483,3 +483,30 @@ class OrderSerializer(ServerErrorModelSerializer):
             instance.options.set(options)
 
         return instance
+
+
+class UpdateOrderStatusSerializer(ServerErrorModelSerializer):
+    class Meta:
+        model = Order
+        fields = [
+            "id",
+            "latest_status",
+        ]
+        read_only_fields = ["id"]
+
+    def update(self, instance, validated_data):
+
+        instance.latest_status = validated_data.get(
+            "latest_status", instance.latest_status
+        )
+
+        order_status = OrderStatus()
+        order_status.order = instance
+        order_status.status = instance.latest_status
+        order_status.user_id = self.context["user"].id
+
+        with transaction.atomic():
+            instance.save()
+            order_status.save()
+
+        return instance
