@@ -61,6 +61,7 @@ class OrderViewset(viewsets.ModelViewSet):
             .select_related("business")
             .first()
         )
+        context["action"] = self.action
         return context
 
     def get_queryset(self):

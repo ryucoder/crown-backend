@@ -312,16 +312,29 @@ class OrderSerializer(ServerErrorModelSerializer):
 
     # to_user_id = serializers.UUIDField(write_only=True)
 
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        if self.context["action"] == "update":
+            for create_field in self.Meta.create_only_fields:
+                self.fields.pop(create_field)
+
     def validate_options_ids(self, options_ids):
 
-        valid_ids = OrderOption.objects.values_list("id", flat=True)
+        queryset = OrderOption.objects.all()
+        valid_ids = queryset.values_list("id", flat=True)
+        option_objects = []
 
         for option_id in options_ids:
             if option_id not in valid_ids:
                 message = "server_invalid_option_id"
                 raise serializers.ValidationError(message)
 
-        return options_ids
+            option = queryset.filter(id=option_id).first()
+            option_objects.append(option)
+
+        return option_objects
 
     def validate_to_laboratory_id(self, to_laboratory_id):
 
@@ -421,12 +434,13 @@ class OrderSerializer(ServerErrorModelSerializer):
             "to_laboratory",
             "latest_status",
         ]
+        create_only_fields = [
+            "to_laboratory_id",
+        ]
 
     def create(self, validated_data):
-        options_ids = validated_data.pop("options_ids")
+        options = validated_data.pop("options_ids")
         to_laboratory = validated_data.pop("to_laboratory_id")
-
-        options = OrderOption.objects.filter(id__in=options_ids)
 
         instance = Order(**validated_data)
         instance.latest_status = "pending"
@@ -444,5 +458,28 @@ class OrderSerializer(ServerErrorModelSerializer):
             instance.save()
             instance.options.set(options)
             order_status.save()
+
+        return instance
+
+    def update(self, instance, validated_data):
+        options = validated_data.pop("options_ids")
+
+        instance.doctor_name = validated_data.get("doctor_name", instance.doctor_name)
+        instance.patient_name = validated_data.get(
+            "patient_name", instance.patient_name
+        )
+        instance.patient_age = validated_data.get("patient_age", instance.patient_age)
+        instance.referrer = validated_data.get("referrer", instance.referrer)
+        instance.delivery_date = validated_data.get(
+            "delivery_date", instance.delivery_date
+        )
+        instance.notes = validated_data.get("notes", instance.notes)
+        instance.is_urgent = validated_data.get("is_urgent", instance.is_urgent)
+        instance.is_active = validated_data.get("is_active", instance.is_active)
+        instance.teeth = validated_data.get("teeth", instance.teeth)
+
+        with transaction.atomic():
+            instance.save()
+            instance.options.set(options)
 
         return instance
