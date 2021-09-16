@@ -25,6 +25,21 @@ from businesses.models import (
 )
 
 
+class BusinessOwnerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmailUser
+        fields = [
+            "id",
+            "first_name",
+            "last_name",
+            "email",
+            "mobile",
+            "user_type",
+            "is_email_verified",
+            "is_mobile_verified",
+        ]
+
+
 class BusinessAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = BusinessAccount
@@ -268,8 +283,9 @@ class BusinessContactSerializer(ServerErrorModelSerializer):
         return instance
 
 
-class BusinessSerializer(ServerErrorSerializer):
+class BusinessSerializer(ServerErrorModelSerializer):
 
+    owner = BusinessOwnerSerializer()
     contacts = BusinessContactSerializer(many=True, read_only=True)
     addresses = BusinessAddressSerializer(many=True, read_only=True)
     accounts = BusinessAccountSerializer(many=True, read_only=True)

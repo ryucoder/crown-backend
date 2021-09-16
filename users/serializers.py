@@ -6,7 +6,7 @@ from businesses.models import (
     BusinessEmployee,
 )
 from businesses.serializers import BusinessOnlySerializer
-from core.serializers import ServerErrorSerializer
+# from core.serializers import ServerErrorSerializer
 from core.utils import EmailUtil, TimeUtil
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
