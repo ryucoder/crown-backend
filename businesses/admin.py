@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from businesses.models import (
     Business,
+    BusinessOwner,
     BusinessEmployee,
     BusinessContact,
     BusinessConnect,
@@ -72,11 +73,27 @@ class BusinessConnectAdmin(admin.ModelAdmin):
     list_per_page = 25
 
 
+@admin.register(BusinessOwner)
+class BusinessOwnerAdmin(admin.ModelAdmin):
+
+    list_filter = ["is_active"]
+
+    list_display = [
+        "id",
+        "business",
+        "owner",
+        "is_active",
+        "created_at",
+        "modified_at",
+    ]
+
+    list_per_page = 25
+
+
 @admin.register(Business)
 class BusinessAdmin(admin.ModelAdmin):
 
     list_filter = [
-        "owner",
         "category",
         "is_active",
     ]
@@ -85,7 +102,6 @@ class BusinessAdmin(admin.ModelAdmin):
         "id",
         "name",
         "gstin",
-        "owner",
         "category",
         "is_active",
         "created_at",

@@ -16,6 +16,7 @@ from users.models import EmailUser
 
 from businesses.models import (
     Business,
+    BusinessOwner,
     BusinessAccount,
     BusinessAddress,
     BusinessContact,
@@ -25,7 +26,7 @@ from businesses.models import (
 )
 
 
-class BusinessOwnerSerializer(serializers.ModelSerializer):
+class BusinessOwnerUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmailUser
         fields = [
@@ -37,6 +38,21 @@ class BusinessOwnerSerializer(serializers.ModelSerializer):
             "user_type",
             "is_email_verified",
             "is_mobile_verified",
+        ]
+
+
+class BusinessOwnerSerializer(serializers.ModelSerializer):
+    owner = BusinessOwnerUserSerializer(read_only=True)
+
+    class Meta:
+        model = BusinessOwner
+        fields = [
+            "id",
+            "business",
+            "owner",
+            "is_active",
+            "created_at",
+            "modified_at",
         ]
 
 
@@ -285,7 +301,7 @@ class BusinessContactSerializer(ServerErrorModelSerializer):
 
 class BusinessSerializer(ServerErrorModelSerializer):
 
-    owner = BusinessOwnerSerializer()
+    owners = BusinessOwnerUserSerializer(many=True, read_only=True)
     contacts = BusinessContactSerializer(many=True, read_only=True)
     addresses = BusinessAddressSerializer(many=True, read_only=True)
     accounts = BusinessAccountSerializer(many=True, read_only=True)
@@ -297,12 +313,12 @@ class BusinessSerializer(ServerErrorModelSerializer):
             "name",
             "gstin",
             "category",
-            "owner",
+            "owners",
             "contacts",
             "addresses",
             "accounts",
         ]
-        read_only_fields = ["owner"]
+        read_only_fields = ["owners"]
 
 
 class BusinessOnlySerializer(serializers.ModelSerializer):

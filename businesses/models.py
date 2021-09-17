@@ -13,17 +13,17 @@ class Business(PrimaryUUIDTimeStampedModel):
         max_length=12, choices=CATEGORY_CHOICES, default="laboratory"
     )
 
-    owner = models.OneToOneField(
-        "users.EmailUser",
-        related_name="business",
-        on_delete=models.CASCADE,
-    )
-
     is_active = models.BooleanField(default=True)
+
+    owners = models.ManyToManyField(
+        "users.EmailUser",
+        blank=True,
+        through="BusinessOwner",
+    )
 
     connected_businesses = models.ManyToManyField(
         "businesses.Business",
-        related_name="business",
+        related_name="conencted_business",
         blank=True,
         through="BusinessConnect",
     )
@@ -34,6 +34,25 @@ class Business(PrimaryUUIDTimeStampedModel):
     class Meta:
         verbose_name = "Business"
         verbose_name_plural = "Businesses"
+
+
+class BusinessOwner(PrimaryUUIDTimeStampedModel):
+
+    business = models.ForeignKey(
+        "businesses.Business", on_delete=models.CASCADE, related_name="business_owners"
+    )
+    owner = models.OneToOneField(
+        "users.EmailUser", on_delete=models.CASCADE, related_name="owned_business"
+    )
+
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.business} - {self.owner}"
+
+    class Meta:
+        verbose_name = "Business Owner"
+        verbose_name_plural = "Business Owners"
 
 
 class BusinessEmployee(PrimaryUUIDTimeStampedModel):
