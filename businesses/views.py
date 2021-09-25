@@ -17,7 +17,13 @@ from businesses.serializers import (
     OrderSerializer,
     UpdateOrderStatusSerializer,
 )
-from businesses.models import Business, BusinessAccount, BusinessContact, Order
+from businesses.models import (
+    Business,
+    BusinessAccount,
+    # BusinessContact,
+    BusinessConnect,
+    # Order,
+)
 
 
 class BusinessViewset(viewsets.ModelViewSet):
@@ -30,6 +36,29 @@ class BusinessViewset(viewsets.ModelViewSet):
             "contacts", "addresses", "accounts"
         )
         return queryset
+
+    @action(detail=False, methods=["get"])
+    def customers_of_laboratory(self, request, *args, **kwargs):
+
+        queryset = BusinessConnect.objects.filter(
+            laboratory_id=request.user.get_business().pk
+        )
+
+        dentist_ids = []
+        for item in queryset:
+            if item.dentist not in dentist_ids:
+                dentist_ids.append(item.dentist.id)
+
+        queryset = self.get_queryset().filter(id__in=dentist_ids)
+        queryset = self.filter_queryset(queryset)
+
+        page = self.paginate_queryset(queryset=queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class OrderViewset(viewsets.ModelViewSet):

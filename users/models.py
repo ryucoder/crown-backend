@@ -56,7 +56,8 @@ class EmailUser(PrimaryUUIDTimeStampedModel, AbstractUser):
         business = None
 
         if self.user_type == "owner":
-            business = self.business
+            business = self.owned_business.business
+
         else:
             business = self.employer.business
 
