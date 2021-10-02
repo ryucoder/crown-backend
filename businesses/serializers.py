@@ -329,9 +329,9 @@ class BusinessOnlySerializer(serializers.ModelSerializer):
             "name",
             "gstin",
             "category",
-            "owner",
+            "is_active",
         ]
-        read_only_fields = ["owner"]
+        read_only_fields = ["owner", "is_active"]
 
 
 class OrderSerializer(ServerErrorModelSerializer):

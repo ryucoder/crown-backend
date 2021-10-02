@@ -1,18 +1,21 @@
 import uuid
 
+from django.contrib.auth.hashers import make_password
+from django.db import transaction
+from django.utils import timezone
+
+from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
+
+from core.serializers import ServerErrorSerializer
+from core.utils import EmailUtil, TimeUtil
+
 from businesses.models import (
     Business,
     BusinessConnect,
     BusinessEmployee,
 )
 from businesses.serializers import BusinessOnlySerializer
-# from core.serializers import ServerErrorSerializer
-from core.utils import EmailUtil, TimeUtil
-from django.contrib.auth.hashers import make_password
-from django.db import transaction
-from django.utils import timezone
-from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
 
 from users.utils import TokenUtil
 from users.constants import (
@@ -24,9 +27,18 @@ from users.constants import (
 from users.models import EmailUser, MobileToken, EmailToken
 
 
-class LoginSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    password = serializers.CharField(min_length=9, max_length=18)
+class LoginSerializer(ServerErrorSerializer):
+
+    email = serializers.EmailField(
+        max_length=255,
+        error_messages=CUSTOM_ERROR_MESSAGES["EmailField"],
+    )
+    password = serializers.CharField(
+        min_length=9,
+        max_length=18,
+        write_only=True,
+        error_messages=CUSTOM_ERROR_MESSAGES["CharField"],
+    )
 
     def validate(self, data):
         email_absent = False
@@ -68,17 +80,19 @@ class EmailUserSerializer(serializers.ModelSerializer):
 
 
 class EmailUserWithBusinessSerializer(serializers.ModelSerializer):
-    def __init__(self, *args, **kwargs):
-        super(EmailUserWithBusinessSerializer, self).__init__(*args, **kwargs)
 
-        if self.instance is not None:
-            if self.instance.user_type == "owner":
-                self.fields["business"] = BusinessOnlySerializer()
+    business = serializers.SerializerMethodField()
 
-            if self.instance.user_type == "employee":
-                self.fields["owners_business"] = BusinessOnlySerializer(
-                    instance=self.instance.employer.business
-                )
+    def get_business(self, instance):
+
+        data = None
+
+        if instance.user_type != "admin":
+            business = self.instance.get_business()
+            business = BusinessOnlySerializer(instance=business)
+            data = business.data
+
+        return data
 
     class Meta:
         model = EmailUser
@@ -138,7 +152,8 @@ class LaboratorySignUpSerializer(serializers.ModelSerializer):
 
     def validate_email(self, email):
         email = email.strip().lower()
-        queryset = EmailUser.objects.filter(email__iexact=email)
+
+        queryset = self.context["queryset"]
 
         if queryset.exists():
             message = "server_exists_already"

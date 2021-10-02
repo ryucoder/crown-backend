@@ -1,3 +1,6 @@
+from decimal import Context
+
+from django.db.models import query
 from core.utils import CommonUtil, EmailUtil, TimeUtil
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -28,7 +31,11 @@ class EmailUserViewset(RetrieveModelMixin, viewsets.GenericViewSet):
     authentication_classes = []
 
     def get_queryset(self):
-        return EmailUser.objects.all()
+        return (
+            EmailUser.objects.all()
+            .select_related("owned_business")
+            .prefetch_related("owned_business__business")
+        )
 
     def get_serializer_class(self):
 
@@ -64,10 +71,18 @@ class EmailUserViewset(RetrieveModelMixin, viewsets.GenericViewSet):
     @action(detail=False, methods=["post"])
     def login(self, request, *args, **kwargs):
 
-        serializer = serializers.LoginSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        queryset = self.get_queryset().filter(email__iexact=request.data["email"])
 
-        user = serializer.validated_data["user"]
+        serializer = serializers.LoginSerializer(
+            data=request.data, context={"queryset": queryset}
+        )
+        result = serializer.is_valid(raise_exception=False)
+
+        if result == False:
+            data = {"errors": serializer.errors}
+            return Response(data, status=status.HTTP_200_OK)
+
+        user = queryset.first()
 
         serializer = serializers.EmailUserWithBusinessSerializer(instance=user)
 
