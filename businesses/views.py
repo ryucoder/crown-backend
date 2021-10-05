@@ -40,9 +40,15 @@ class BusinessViewset(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"])
     def customers_of_laboratory(self, request, *args, **kwargs):
 
-        queryset = BusinessConnect.objects.filter(
-            laboratory_id=request.user.get_business().pk
+        current_user = (
+            EmailUser.objects.filter(id=request.user.pk)
+            .select_related("owned_business")
+            .first()
         )
+
+        current_business = current_user.get_business()
+
+        queryset = BusinessConnect.objects.filter(laboratory_id=current_business.pk)
 
         dentist_ids = []
         for item in queryset:
