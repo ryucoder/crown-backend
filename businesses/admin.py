@@ -102,6 +102,7 @@ class BusinessAdmin(admin.ModelAdmin):
         "id",
         "name",
         "gstin",
+        "website",
         "category",
         "is_active",
         "created_at",

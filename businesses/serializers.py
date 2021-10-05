@@ -312,6 +312,7 @@ class BusinessSerializer(ServerErrorModelSerializer):
             "id",
             "name",
             "gstin",
+            "website",
             "category",
             "owners",
             "contacts",
@@ -328,6 +329,7 @@ class BusinessOnlySerializer(serializers.ModelSerializer):
             "id",
             "name",
             "gstin",
+            "website",
             "category",
             "is_active",
         ]

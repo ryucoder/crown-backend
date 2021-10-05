@@ -13,6 +13,8 @@ class Business(PrimaryUUIDTimeStampedModel):
         max_length=12, choices=CATEGORY_CHOICES, default="laboratory"
     )
 
+    website = models.URLField(null=True, blank=True)
+
     is_active = models.BooleanField(default=True)
 
     owners = models.ManyToManyField(
