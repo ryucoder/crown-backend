@@ -94,7 +94,7 @@ class OrderViewset(viewsets.ModelViewSet):
         context = super().get_serializer_context()
         context["user"] = (
             EmailUser.objects.filter(id=self.request.user.pk)
-            .select_related("business")
+            # .select_related("business")
             .first()
         )
         context["action"] = self.action
@@ -110,25 +110,20 @@ class OrderViewset(viewsets.ModelViewSet):
 
     def get_queryset(self):
 
-        user = (
-            EmailUser.objects.filter(id=self.request.user.pk)
-            .select_related("business")
-            .prefetch_related("orders_created", "business__orders_created")
-            .first()
-        )
+        user = EmailUser.objects.filter(id=self.request.user.pk).first()
         users_business = user.get_business()
 
         if users_business.category == "dentist":
             if user.user_type == "owner":
-                queryset = users_business.orders_created.all()
+                queryset = users_business.orders_created.all().order_by("created_at")
             if user.user_type == "employee":
-                queryset = user.orders_created.all()
+                queryset = user.orders_created.all().order_by("created_at")
 
         if users_business.category == "laboratory":
             if user.user_type == "owner":
-                queryset = users_business.orders_received.all()
+                queryset = users_business.orders_received.all().order_by("created_at")
             if user.user_type == "employee":
-                queryset = user.orders_received.all()
+                queryset = user.orders_received.all().order_by("created_at")
 
         # dentist
         # owner - from_dentist

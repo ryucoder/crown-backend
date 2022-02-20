@@ -339,6 +339,10 @@ class BusinessOnlySerializer(serializers.ModelSerializer):
 class OrderSerializer(ServerErrorModelSerializer):
 
     options = OrderOptionSerializer(read_only=True, many=True)
+    to_laboratory = BusinessOnlySerializer(read_only=True)
+    from_dentist = BusinessOnlySerializer(read_only=True)
+    from_user = BusinessOwnerUserSerializer(read_only=True)
+    to_user = BusinessOwnerUserSerializer(read_only=True)
 
     options_ids = serializers.ListField(child=serializers.UUIDField(), write_only=True)
 
