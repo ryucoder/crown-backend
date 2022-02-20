@@ -339,14 +339,14 @@ class BusinessOnlySerializer(serializers.ModelSerializer):
 class OrderSerializer(ServerErrorModelSerializer):
 
     options = OrderOptionSerializer(read_only=True, many=True)
-    to_laboratory = BusinessOnlySerializer(read_only=True)
-    from_dentist = BusinessOnlySerializer(read_only=True)
+    to_business = BusinessOnlySerializer(read_only=True)
+    from_business = BusinessOnlySerializer(read_only=True)
     from_user = BusinessOwnerUserSerializer(read_only=True)
     to_user = BusinessOwnerUserSerializer(read_only=True)
 
     options_ids = serializers.ListField(child=serializers.UUIDField(), write_only=True)
 
-    to_laboratory_id = serializers.UUIDField(write_only=True)
+    to_business_id = serializers.UUIDField(write_only=True)
 
     # to_user_id = serializers.UUIDField(write_only=True)
 
@@ -374,10 +374,10 @@ class OrderSerializer(ServerErrorModelSerializer):
 
         return option_objects
 
-    def validate_to_laboratory_id(self, to_laboratory_id):
+    def validate_to_business_id(self, to_business_id):
 
         # Condition 1
-        queryset = Business.objects.filter(id=to_laboratory_id).prefetch_related(
+        queryset = Business.objects.filter(id=to_business_id).prefetch_related(
             Prefetch(
                 "laboratories", queryset=BusinessConnect.objects.filter(is_active=True)
             ),
@@ -392,7 +392,7 @@ class OrderSerializer(ServerErrorModelSerializer):
             "laboratory_id", flat=True
         )
 
-        if to_laboratory_id not in connect_ids:
+        if to_business_id not in connect_ids:
             message = "server_to_laboratory_id_not_connected"
             raise serializers.ValidationError(message)
 
@@ -446,7 +446,7 @@ class OrderSerializer(ServerErrorModelSerializer):
         model = Order
         fields = [
             # "to_user_id",
-            "to_laboratory_id",
+            "to_business_id",
             "options_ids",
             "id",
             "doctor_name",
@@ -460,32 +460,32 @@ class OrderSerializer(ServerErrorModelSerializer):
             "is_active",
             "teeth",
             "latest_status",
-            "from_dentist",
+            "from_business",
             "from_user",
-            "to_laboratory",
+            "to_business",
             "to_user",
         ]
         read_only_fields = [
             "from_user",
             "to_user",
-            "from_dentist",
-            "to_laboratory",
+            "from_business",
+            "to_business",
             "latest_status",
         ]
         create_only_fields = [
-            "to_laboratory_id",
+            "to_business_id",
         ]
 
     def create(self, validated_data):
         options = validated_data.pop("options_ids")
-        to_laboratory = validated_data.pop("to_laboratory_id")
+        to_business = validated_data.pop("to_business_id")
 
         instance = Order(**validated_data)
         instance.latest_status = "pending"
-        instance.to_laboratory = to_laboratory
-        instance.to_user = to_laboratory.owner
+        instance.to_business = to_business
+        instance.to_user = to_business.owner
         instance.from_user_id = self.context["user"].id
-        instance.from_dentist = self.context["user"].get_business()
+        instance.from_business = self.context["user"].get_business()
 
         order_status = OrderStatus()
         order_status.order = instance
