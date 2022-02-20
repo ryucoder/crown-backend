@@ -24,9 +24,9 @@ class OrderAdmin(admin.ModelAdmin):
 
     list_display = [
         "id",
-        "from_dentist",
+        "from_business",
         "from_user",
-        "to_laboratory",
+        "to_business",
         "to_user",
         "latest_status",
         "is_urgent",

@@ -233,7 +233,7 @@ class Order(PrimaryUUIDTimeStampedModel):
         max_length=255, choices=ORDER_STATUS_CHOICES, default="pending"
     )
 
-    from_dentist = models.ForeignKey(
+    from_business = models.ForeignKey(
         "businesses.Business", on_delete=models.CASCADE, related_name="orders_created"
     )
 
@@ -241,7 +241,7 @@ class Order(PrimaryUUIDTimeStampedModel):
         "users.EmailUser", on_delete=models.CASCADE, related_name="orders_created"
     )
 
-    to_laboratory = models.ForeignKey(
+    to_business = models.ForeignKey(
         "businesses.Business", on_delete=models.CASCADE, related_name="orders_received"
     )
 
