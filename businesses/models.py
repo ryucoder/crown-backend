@@ -1,4 +1,4 @@
-from core.models import PrimaryUUIDTimeStampedModel
+from core.models import PrimaryUUIDTimeStampedModel, TimeStampedModel
 from django.db import models
 
 from businesses.constants import CATEGORY_CHOICES, ORDER_STATUS_CHOICES
@@ -203,7 +203,7 @@ class OrderStatus(PrimaryUUIDTimeStampedModel):
         verbose_name_plural = "Order Statuses"
 
 
-class Order(PrimaryUUIDTimeStampedModel):
+class Order(TimeStampedModel):
     # work field needs to be added to this model
     # Need to ask mahendra - what is tooth shade??
 
