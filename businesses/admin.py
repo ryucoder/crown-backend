@@ -105,6 +105,7 @@ class BusinessAdmin(admin.ModelAdmin):
         "website",
         "category",
         "is_active",
+        "referral",
         "created_at",
         "modified_at",
     ]
