@@ -29,6 +29,7 @@ from businesses.models import (
 class BusinessViewset(viewsets.ModelViewSet):
 
     serializer_class = BusinessSerializer
+    pagination_class = CurrentPagePagination
     authentication_classes = CommonUtil.get_authentication_classes()
 
     def get_queryset(self):

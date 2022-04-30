@@ -314,12 +314,14 @@ class BusinessSerializer(ServerErrorModelSerializer):
             "gstin",
             "website",
             "category",
+            "is_active",
+            "referral",
             "owners",
             "contacts",
             "addresses",
             "accounts",
         ]
-        read_only_fields = ["owners"]
+        read_only_fields = ["is_active", "referral", "owners"]
 
 
 class BusinessOnlySerializer(serializers.ModelSerializer):

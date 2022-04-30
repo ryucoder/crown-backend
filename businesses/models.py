@@ -17,6 +17,14 @@ class Business(PrimaryUUIDTimeStampedModel):
 
     is_active = models.BooleanField(default=True)
 
+    referral = models.ForeignKey(
+        "businesses.Business",
+        on_delete=models.CASCADE,
+        related_name="referrals",
+        null=True,
+        blank=True,
+    )
+
     owners = models.ManyToManyField(
         "users.EmailUser",
         blank=True,
