@@ -421,12 +421,11 @@ class BusinessWithOwnerSerializer(ServerErrorSerializer):
         owner.owner = email_user
         owner.is_active = True
 
-        # TODO: Update business connect
-
         with transaction.atomic():
             email_user.save()
             business.save()
             owner.save()
+            business.connected_businesses.add(user.get_business())
 
         return business
 
