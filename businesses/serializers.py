@@ -1,3 +1,5 @@
+from pprint import pprint
+
 from django.db import transaction
 from django.db.models import Prefetch
 
@@ -14,6 +16,7 @@ from core.models import OrderOption, State
 
 from users.models import EmailUser
 
+from businesses.constants import CATEGORY_CHOICES
 from businesses.models import (
     Business,
     BusinessOwner,
@@ -335,7 +338,97 @@ class BusinessOnlySerializer(serializers.ModelSerializer):
             "category",
             "is_active",
         ]
-        read_only_fields = ["owner", "is_active"]
+        read_only_fields = ["is_active"]
+
+
+class BusinessWithOwnerSerializer(ServerErrorSerializer):
+
+    name = serializers.CharField(write_only=True, max_length=255)
+    gstin = serializers.CharField(
+        write_only=True,
+        max_length=16,
+        min_length=16,
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        trim_whitespace=True,
+    )
+    website = serializers.URLField(
+        write_only=True,
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        trim_whitespace=True,
+    )
+    category = serializers.ChoiceField(write_only=True, choices=CATEGORY_CHOICES)
+    first_name = serializers.CharField(write_only=True, max_length=255)
+    last_name = serializers.CharField(write_only=True, max_length=255)
+    email = serializers.EmailField(write_only=True)
+    mobile = serializers.CharField(
+        write_only=True,
+        max_length=10,
+        min_length=10,
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        trim_whitespace=True,
+    )
+
+    class Meta:
+        fields = [
+            "id",
+            "name",
+            "gstin",
+            "website",
+            "category",
+            "first_name",
+            "last_name",
+            "email",
+            "mobile",
+        ]
+
+    def create(self, validated_data):
+        user = self.context["user"]
+
+        # user
+        # business
+        # business owner
+        # business connect
+
+        mobile = validated_data["mobile"]
+
+        if mobile is not None and len(mobile.strip()) == 10:
+            mobile = int(mobile)
+        else:
+            mobile = 0
+
+        email_user = EmailUser()
+        email_user.first_name = validated_data["first_name"]
+        email_user.last_name = validated_data["last_name"]
+        email_user.email = validated_data["email"]
+        email_user.mobile = mobile
+        email_user.user_type = "owner"
+
+        business = Business()
+        business.name = validated_data["first_name"]
+        business.category = validated_data["category"]
+        business.gstin = validated_data["gstin"]
+        business.website = validated_data["website"]
+        business.referral = user.get_business()
+
+        owner = BusinessOwner()
+        owner.business = business
+        owner.owner = email_user
+        owner.is_active = True
+
+        # TODO: Update business connect
+
+        with transaction.atomic():
+            email_user.save()
+            business.save()
+            owner.save()
+
+        return business
 
 
 class OrderSerializer(ServerErrorModelSerializer):

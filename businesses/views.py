@@ -16,6 +16,7 @@ from businesses.serializers import (
     ToggleDefaultBusinessAddressSerializer,
     OrderSerializer,
     UpdateOrderStatusSerializer,
+    BusinessWithOwnerSerializer,
 )
 from businesses.models import (
     Business,
@@ -32,11 +33,29 @@ class BusinessViewset(viewsets.ModelViewSet):
     pagination_class = CurrentPagePagination
     authentication_classes = CommonUtil.get_authentication_classes()
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["user"] = (
+            EmailUser.objects.filter(id=self.request.user.pk)
+            # .select_related("business")
+            .first()
+        )
+        context["action"] = self.action
+        return context
+
     def get_queryset(self):
         queryset = Business.objects.all().prefetch_related(
             "contacts", "addresses", "accounts"
         )
         return queryset
+
+    def get_serializer_class(self):
+        serializer = self.serializer_class
+
+        if self.action == "create_business_with_owner":
+            serializer = BusinessWithOwnerSerializer
+
+        return serializer
 
     @action(detail=False, methods=["get"])
     def customers_of_laboratory(self, request, *args, **kwargs):
@@ -66,6 +85,19 @@ class BusinessViewset(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+    @action(detail=False, methods=["post"])
+    def create_business_with_owner(self, request, *args, **kwargs):
+
+        context = self.get_serializer_context()
+        serializer = BusinessWithOwnerSerializer(data=request.data, context=context)
+        serializer.is_valid(raise_exception=True)
+
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
 
 
 class OrderViewset(viewsets.ModelViewSet):
