@@ -194,12 +194,7 @@ class BusinessAccountViewset(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def get_queryset(self):
-        user = (
-            EmailUser.objects.filter(id=self.request.user.pk)
-            .select_related("business")
-            .prefetch_related("business__accounts")
-            .first()
-        )
+        user = EmailUser.objects.filter(id=self.request.user.pk).first()
         queryset = BusinessAccount.objects.filter(business=user.get_business())
         return queryset
 

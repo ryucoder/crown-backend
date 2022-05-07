@@ -16,6 +16,7 @@ class Business(PrimaryUUIDTimeStampedModel):
     website = models.URLField(null=True, blank=True)
 
     is_active = models.BooleanField(default=True)
+    is_claimed = models.BooleanField(default=True)
 
     referral = models.ForeignKey(
         "businesses.Business",

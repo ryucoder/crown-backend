@@ -28,6 +28,8 @@ from businesses.models import (
     OrderStatus,
 )
 
+from core.serializers import ServerErrorModelSerializer
+
 
 class BusinessOwnerUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -70,9 +72,7 @@ class BusinessAccountSerializer(serializers.ModelSerializer):
             "ifsc_code",
             "account_type",
             "is_default",
-            "business",
         ]
-        read_only_fields = ["business"]
 
     def create(self, validated_data):
         user = validated_data.pop("user")
@@ -318,13 +318,14 @@ class BusinessSerializer(ServerErrorModelSerializer):
             "website",
             "category",
             "is_active",
+            "is_claimed",
             "referral",
             "owners",
             "contacts",
             "addresses",
             "accounts",
         ]
-        read_only_fields = ["is_active", "referral", "owners"]
+        read_only_fields = ["is_active", "is_claimed", "referral", "owners"]
 
 
 class BusinessOnlySerializer(serializers.ModelSerializer):
