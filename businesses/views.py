@@ -99,6 +99,22 @@ class BusinessViewset(viewsets.ModelViewSet):
             serializer.data, status=status.HTTP_201_CREATED, headers=headers
         )
 
+    @action(detail=False, methods=["get"])
+    def except_mine(self, request, *args, **kwargs):
+
+        current_user = (
+            EmailUser.objects.filter(id=request.user.pk)
+            .select_related("owned_business")
+            .first()
+        )
+
+        current_business = current_user.get_business()
+
+        queryset = Business.objects.exclude(id=current_business.id)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
 
 class OrderViewset(viewsets.ModelViewSet):
 
