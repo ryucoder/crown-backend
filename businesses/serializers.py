@@ -416,6 +416,7 @@ class BusinessWithOwnerSerializer(ServerErrorSerializer):
         business.gstin = validated_data["gstin"]
         business.website = validated_data["website"]
         business.referral = user.get_business()
+        business.is_claimed = False
 
         owner = BusinessOwner()
         owner.business = business
