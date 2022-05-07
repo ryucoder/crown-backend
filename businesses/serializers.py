@@ -411,7 +411,7 @@ class BusinessWithOwnerSerializer(ServerErrorSerializer):
         email_user.user_type = "owner"
 
         business = Business()
-        business.name = validated_data["first_name"]
+        business.name = validated_data["name"]
         business.category = validated_data["category"]
         business.gstin = validated_data["gstin"]
         business.website = validated_data["website"]
