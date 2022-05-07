@@ -75,7 +75,9 @@ class BusinessViewset(viewsets.ModelViewSet):
             if item.dentist not in dentist_ids:
                 dentist_ids.append(item.dentist.id)
 
-        queryset = self.get_queryset().filter(id__in=dentist_ids)
+        queryset = (
+            self.get_queryset().filter(id__in=dentist_ids).order_by("-created_at")
+        )
         queryset = self.filter_queryset(queryset)
 
         page = self.paginate_queryset(queryset=queryset)
