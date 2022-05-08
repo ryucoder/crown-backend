@@ -2,7 +2,7 @@ from pprint import pprint
 
 from rest_framework import serializers
 
-from core.models import State, OrderOption
+from core.models import State, JobType
 
 
 class StateSerializer(serializers.ModelSerializer):
@@ -11,9 +11,9 @@ class StateSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "gst_code"]
 
 
-class OrderOptionSerializer(serializers.ModelSerializer):
+class JobTypeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = OrderOption
+        model = JobType
         fields = ["id", "option"]
 
 

@@ -37,12 +37,12 @@ class State(PrimaryUUIDTimeStampedModel):
         verbose_name_plural = "States"
 
 
-class OrderOption(PrimaryUUIDTimeStampedModel):
+class JobType(PrimaryUUIDTimeStampedModel):
     option = models.CharField(max_length=255)
 
     def __str__(self):
         return self.option
 
     class Meta:
-        verbose_name = "Order Option"
-        verbose_name_plural = "Order Options"
+        verbose_name = "Job Type"
+        verbose_name_plural = "Job Types"

@@ -227,7 +227,7 @@ class Order(TimeStampedModel):
 
     notes = models.TextField(null=True, blank=True)
 
-    options = models.ManyToManyField("core.OrderOption", related_name="orders")
+    job_types = models.ManyToManyField("core.JobType", related_name="orders")
 
     is_urgent = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)

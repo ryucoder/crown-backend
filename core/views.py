@@ -2,8 +2,8 @@ from django.shortcuts import render
 
 from rest_framework import viewsets
 
-from core.models import State, OrderOption
-from core.serializers import StateSerializer, OrderOptionSerializer
+from core.models import State, JobType
+from core.serializers import StateSerializer, JobTypeSerializer
 
 
 class StateViewset(viewsets.ReadOnlyModelViewSet):
@@ -17,8 +17,8 @@ class StateViewset(viewsets.ReadOnlyModelViewSet):
 
 class OrderOptionViewset(viewsets.ReadOnlyModelViewSet):
 
-    serializer_class = OrderOptionSerializer
+    serializer_class = JobTypeSerializer
 
     def get_queryset(self):
-        queryset = OrderOption.objects.all()
+        queryset = JobType.objects.all()
         return queryset

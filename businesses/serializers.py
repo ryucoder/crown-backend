@@ -10,9 +10,9 @@ from rest_framework import serializers
 from core.serializers import (
     ServerErrorSerializer,
     ServerErrorModelSerializer,
-    OrderOptionSerializer,
+    JobTypeSerializer,
 )
-from core.models import OrderOption, State
+from core.models import JobType, State
 
 from users.models import EmailUser
 
@@ -434,7 +434,7 @@ class BusinessWithOwnerSerializer(ServerErrorSerializer):
 
 class OrderSerializer(ServerErrorModelSerializer):
 
-    options = OrderOptionSerializer(read_only=True, many=True)
+    job_types = JobTypeSerializer(read_only=True, many=True)
     to_business = BusinessOnlySerializer(read_only=True)
     from_business = BusinessOnlySerializer(read_only=True)
     from_user = BusinessOwnerUserSerializer(read_only=True)
@@ -456,7 +456,7 @@ class OrderSerializer(ServerErrorModelSerializer):
 
     def validate_options_ids(self, options_ids):
 
-        queryset = OrderOption.objects.all()
+        queryset = JobType.objects.all()
         valid_ids = queryset.values_list("id", flat=True)
         option_objects = []
 

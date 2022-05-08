@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from core.models import State, OrderOption
+from core.models import State, JobType
 
 
 @admin.register(State)
@@ -17,7 +17,7 @@ class StateAdmin(admin.ModelAdmin):
     list_per_page = 50
 
 
-@admin.register(OrderOption)
+@admin.register(JobType)
 class OrderOptionAdmin(admin.ModelAdmin):
 
     list_display = [
