@@ -15,7 +15,7 @@ class StateViewset(viewsets.ReadOnlyModelViewSet):
         return queryset
 
 
-class OrderOptionViewset(viewsets.ReadOnlyModelViewSet):
+class JobTypeViewset(viewsets.ReadOnlyModelViewSet):
 
     serializer_class = JobTypeSerializer
 

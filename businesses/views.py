@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.db.models import Q
 
 from rest_framework import serializers, status, viewsets
 from rest_framework.decorators import action
@@ -23,7 +23,7 @@ from businesses.models import (
     BusinessAccount,
     # BusinessContact,
     BusinessConnect,
-    # Order,
+    Order,
 )
 
 
@@ -164,18 +164,35 @@ class OrderViewset(viewsets.ModelViewSet):
         user = EmailUser.objects.filter(id=self.request.user.pk).first()
         users_business = user.get_business()
 
-        if users_business.category == "dentist":
-            if user.user_type == "owner":
-                queryset = users_business.orders_created.all().order_by("created_at")
-            if user.user_type == "employee":
-                queryset = user.orders_created.all().order_by("created_at")
+        # if users_business.category == "dentist":
+        #     if user.user_type == "owner":
+        #         queryset = users_business.orders_created.all().order_by("created_at")
+        #     if user.user_type == "employee":
+        #         queryset = user.orders_created.all().order_by("created_at")
 
-        if users_business.category == "laboratory":
-            if user.user_type == "owner":
-                queryset = users_business.orders_received.all().order_by("created_at")
-            if user.user_type == "employee":
-                queryset = user.orders_received.all().order_by("created_at")
+        # if users_business.category == "laboratory":
+        #     if user.user_type == "owner":
+        #         queryset = users_business.orders_received.all().order_by("created_at")
+        #     if user.user_type == "employee":
+        #         queryset = user.orders_received.all().order_by("created_at")
+        # queryset = users_business.orders_received.all().order_by("-created_at")
 
+        queryset = Order.objects.filter(
+            Q(from_business=users_business) | Q(to_business=users_business)
+        ).order_by("-created_at")
+
+        print()
+        print()
+        print("user")
+        print(user)
+        print()
+        print("users_business")
+        print(users_business)
+        print()
+        print("queryset")
+        print(queryset)
+        print()
+        print()
         # dentist
         # owner - from_dentist
         # employee - from_user

@@ -223,7 +223,7 @@ class Order(TimeStampedModel):
 
     referrer = models.CharField(max_length=255, null=True, blank=True)
 
-    delivery_date = models.DateTimeField(null=True, blank=True)
+    delivery_date = models.DateField(null=True, blank=True)
 
     notes = models.TextField(null=True, blank=True)
 
@@ -255,7 +255,11 @@ class Order(TimeStampedModel):
     )
 
     to_user = models.ForeignKey(
-        "users.EmailUser", on_delete=models.CASCADE, related_name="orders_received"
+        "users.EmailUser",
+        on_delete=models.CASCADE,
+        related_name="orders_received",
+        null=True,
+        blank=True,
     )
 
     def __str__(self):

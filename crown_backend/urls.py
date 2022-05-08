@@ -28,15 +28,13 @@ from businesses.views import (
     OrderViewset,
 )
 
-from core.views import OrderOptionViewset, StateViewset
+from core.views import JobTypeViewset, StateViewset
 
 from users.views import EmailUserViewset, RegisteredEmailUserViewset
 
 default_router = DefaultRouter()
 default_router.register(r"api/states", StateViewset, basename="states")
-default_router.register(
-    r"api/order-options", OrderOptionViewset, basename="order-option"
-)
+default_router.register(r"api/job-types", JobTypeViewset, basename="job-type")
 default_router.register(r"api/businesses", BusinessViewset, basename="businesses")
 default_router.register(
     r"api/business/accounts", BusinessAccountViewset, basename="business-accounts"

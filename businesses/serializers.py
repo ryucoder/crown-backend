@@ -440,11 +440,11 @@ class OrderSerializer(ServerErrorModelSerializer):
     from_user = BusinessOwnerUserSerializer(read_only=True)
     to_user = BusinessOwnerUserSerializer(read_only=True)
 
-    options_ids = serializers.ListField(child=serializers.UUIDField(), write_only=True)
+    job_types_ids = serializers.ListField(
+        child=serializers.UUIDField(), write_only=True
+    )
 
     to_business_id = serializers.UUIDField(write_only=True)
-
-    # to_user_id = serializers.UUIDField(write_only=True)
 
     def __init__(self, *args, **kwargs):
 
@@ -454,55 +454,32 @@ class OrderSerializer(ServerErrorModelSerializer):
             for create_field in self.Meta.create_only_fields:
                 self.fields.pop(create_field)
 
-    def validate_options_ids(self, options_ids):
+    def validate_job_types_ids(self, job_types_ids):
 
         queryset = JobType.objects.all()
         valid_ids = queryset.values_list("id", flat=True)
-        option_objects = []
+        job_type_objects = []
 
-        for option_id in options_ids:
-            if option_id not in valid_ids:
+        for job_type_id in job_types_ids:
+            if job_type_id not in valid_ids:
                 message = "server_invalid_option_id"
                 raise serializers.ValidationError(message)
 
-            option = queryset.filter(id=option_id).first()
-            option_objects.append(option)
+            option = queryset.filter(id=job_type_id).first()
+            job_type_objects.append(option)
 
-        return option_objects
+        return job_type_objects
 
     def validate_to_business_id(self, to_business_id):
 
         # Condition 1
-        queryset = Business.objects.filter(id=to_business_id).prefetch_related(
-            Prefetch(
-                "laboratories", queryset=BusinessConnect.objects.filter(is_active=True)
-            ),
-        )
+        queryset = Business.objects.filter(id=to_business_id)
 
         if not queryset.exists():
-            message = "server_absent_to_laboratory_id"
-            raise serializers.ValidationError(message)
-
-        # Condition 2
-        connect_ids = queryset.first().laboratories.values_list(
-            "laboratory_id", flat=True
-        )
-
-        if to_business_id not in connect_ids:
-            message = "server_to_laboratory_id_not_connected"
+            message = "server_absent_to_business_id"
             raise serializers.ValidationError(message)
 
         return queryset.first()
-
-    # def validate_to_user_id(self, to_user_id):
-
-    #     queryset = EmailUser.objects.filter(id=to_user_id)
-
-    #     if not queryset.exists():
-    #         message = "server_absent_to_user_id"
-    #         raise serializers.ValidationError(message)
-
-    #     return queryset.first()
 
     def validate_teeth(self, teeth):
 
@@ -543,7 +520,7 @@ class OrderSerializer(ServerErrorModelSerializer):
         fields = [
             # "to_user_id",
             "to_business_id",
-            "options_ids",
+            "job_types_ids",
             "id",
             "doctor_name",
             "patient_name",
@@ -551,7 +528,7 @@ class OrderSerializer(ServerErrorModelSerializer):
             "referrer",
             "delivery_date",
             "notes",
-            "options",
+            "job_types",
             "is_urgent",
             "is_active",
             "teeth",
@@ -573,13 +550,13 @@ class OrderSerializer(ServerErrorModelSerializer):
         ]
 
     def create(self, validated_data):
-        options = validated_data.pop("options_ids")
+        job_types = validated_data.pop("job_types_ids")
         to_business = validated_data.pop("to_business_id")
 
         instance = Order(**validated_data)
         instance.latest_status = "pending"
         instance.to_business = to_business
-        instance.to_user = to_business.owner
+        # instance.to_user = to_business.owners.first()
         instance.from_user_id = self.context["user"].id
         instance.from_business = self.context["user"].get_business()
 
@@ -590,13 +567,13 @@ class OrderSerializer(ServerErrorModelSerializer):
 
         with transaction.atomic():
             instance.save()
-            instance.options.set(options)
+            instance.job_types.set(job_types)
             order_status.save()
 
         return instance
 
     def update(self, instance, validated_data):
-        options = validated_data.pop("options_ids")
+        job_types = validated_data.pop("job_types_ids")
 
         instance.doctor_name = validated_data.get("doctor_name", instance.doctor_name)
         instance.patient_name = validated_data.get(
@@ -614,7 +591,7 @@ class OrderSerializer(ServerErrorModelSerializer):
 
         with transaction.atomic():
             instance.save()
-            instance.options.set(options)
+            instance.job_types.set(job_types)
 
         return instance
 
