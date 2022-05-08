@@ -6,13 +6,21 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('businesses', '0016_auto_20210802_1058'),
+        ("businesses", "0016_auto_20210802_1058"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='businesscontact',
-            name='contact_type',
-            field=models.CharField(choices=[('mobile', 'mobile'), ('landline', 'landline'), ('email', 'email')], default='mobile', max_length=8),
+            model_name="businesscontact",
+            name="contact_type",
+            field=models.CharField(
+                choices=[
+                    ("mobile", "mobile"),
+                    ("landline", "landline"),
+                    ("email", "email"),
+                ],
+                default="mobile",
+                max_length=8,
+            ),
         ),
     ]
