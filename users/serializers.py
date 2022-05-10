@@ -654,31 +654,31 @@ class ConnectRelatedBusinessSerializer(serializers.ModelSerializer):
         model = BusinessConnect
         fields = [
             "id",
-            "dentist",
-            "laboratory",
+            "from_business",
+            "to_business",
             "is_active",
             "business_id",
         ]
-        read_only_fields = ["dentist", "laboratory", "is_active"]
+        read_only_fields = ["from_business", "to_business", "is_active"]
 
     def create(self, validated_data):
 
         user = self.context["user"]
 
         connect = BusinessConnect()
-        users_business = user.get_business()
-        related_business = validated_data["business_id"]
+        # users_business = user.get_business()
+        # related_business = validated_data["business_id"]
 
-        if users_business.category == "dentist":
-            connect.dentist = users_business
-            connect.laboratory = related_business
+        # if users_business.category == "dentist":
+        #     connect.dentist = users_business
+        #     connect.laboratory = related_business
 
-        else:
-            connect.dentist = related_business
-            connect.laboratory = users_business
+        # else:
+        #     connect.dentist = related_business
+        #     connect.laboratory = users_business
 
-        with transaction.atomic():
-            connect.save()
+        # with transaction.atomic():
+        #     connect.save()
 
         return connect
 

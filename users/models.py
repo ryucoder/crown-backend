@@ -4,13 +4,13 @@ from django.utils import timezone
 
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from core.models import PrimaryUUIDTimeStampedModel
+from core.models import TimeStampedModel
 
 from users.constants import USER_TYPE_CHOICES, EMAIL_TOKEN_CATEGORY_CHOICES
 from users.managers import UserManager
 
 
-class EmailUser(PrimaryUUIDTimeStampedModel, AbstractUser):
+class EmailUser(TimeStampedModel, AbstractUser):
 
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
@@ -71,7 +71,7 @@ class EmailUser(PrimaryUUIDTimeStampedModel, AbstractUser):
         verbose_name_plural = "Email Users"
 
 
-class EmailToken(PrimaryUUIDTimeStampedModel):
+class EmailToken(TimeStampedModel):
 
     email_user = models.ForeignKey(
         "users.EmailUser",
@@ -96,7 +96,7 @@ class EmailToken(PrimaryUUIDTimeStampedModel):
         unique_together = ["email_user", "token"]
 
 
-class MobileToken(PrimaryUUIDTimeStampedModel):
+class MobileToken(TimeStampedModel):
     email_user = models.ForeignKey(
         "users.EmailUser",
         related_name="mobile_tokens",

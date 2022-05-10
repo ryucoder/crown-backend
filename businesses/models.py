@@ -1,10 +1,10 @@
-from core.models import PrimaryUUIDTimeStampedModel, TimeStampedModel
+from core.models import TimeStampedModel
 from django.db import models
 
 from businesses.constants import CATEGORY_CHOICES, ORDER_STATUS_CHOICES
 
 
-class Business(PrimaryUUIDTimeStampedModel):
+class Business(TimeStampedModel):
     name = models.CharField(max_length=255)
 
     gstin = models.CharField(max_length=15, null=True, blank=True)
@@ -47,7 +47,7 @@ class Business(PrimaryUUIDTimeStampedModel):
         verbose_name_plural = "Businesses"
 
 
-class BusinessOwner(PrimaryUUIDTimeStampedModel):
+class BusinessOwner(TimeStampedModel):
 
     business = models.ForeignKey(
         "businesses.Business", on_delete=models.CASCADE, related_name="business_owners"
@@ -66,7 +66,7 @@ class BusinessOwner(PrimaryUUIDTimeStampedModel):
         verbose_name_plural = "Business Owners"
 
 
-class BusinessEmployee(PrimaryUUIDTimeStampedModel):
+class BusinessEmployee(TimeStampedModel):
 
     business = models.ForeignKey(
         "businesses.Business",
@@ -87,7 +87,7 @@ class BusinessEmployee(PrimaryUUIDTimeStampedModel):
         verbose_name_plural = "Business Employees"
 
 
-class BusinessContact(PrimaryUUIDTimeStampedModel):
+class BusinessContact(TimeStampedModel):
     CONTACT_TYPE_CHOICES = (
         ("mobile", "mobile"),
         ("landline", "landline"),
@@ -113,7 +113,7 @@ class BusinessContact(PrimaryUUIDTimeStampedModel):
         verbose_name_plural = "Business Contacts"
 
 
-class BusinessAddress(PrimaryUUIDTimeStampedModel):
+class BusinessAddress(TimeStampedModel):
     ADDRESS_CHOICES = [
         ("headquarters", "headquarters"),
         ("branch", "branch"),
@@ -130,6 +130,12 @@ class BusinessAddress(PrimaryUUIDTimeStampedModel):
         "businesses.Business", on_delete=models.CASCADE, related_name="addresses"
     )
 
+    city = models.ForeignKey(
+        "core.City", on_delete=models.PROTECT, related_name="addresses"
+    )
+    district = models.ForeignKey(
+        "core.District", on_delete=models.PROTECT, related_name="addresses"
+    )
     state = models.ForeignKey(
         "core.State", on_delete=models.PROTECT, related_name="addresses"
     )
@@ -145,7 +151,7 @@ class BusinessAddress(PrimaryUUIDTimeStampedModel):
         ordering = ["business", "address_type"]
 
 
-class BusinessAccount(PrimaryUUIDTimeStampedModel):
+class BusinessAccount(TimeStampedModel):
 
     BANK_ACCOUNT_TYPE_CHOICES = [
         ("current", "current"),
@@ -173,11 +179,11 @@ class BusinessAccount(PrimaryUUIDTimeStampedModel):
         verbose_name_plural = "Business Accounts"
 
 
-class BusinessConnect(PrimaryUUIDTimeStampedModel):
-    dentist = models.ForeignKey(
+class BusinessConnect(TimeStampedModel):
+    from_business = models.ForeignKey(
         "businesses.Business", related_name="dentists", on_delete=models.CASCADE
     )
-    laboratory = models.ForeignKey(
+    to_business = models.ForeignKey(
         "businesses.Business",
         related_name="laboratories",
         on_delete=models.CASCADE,
@@ -192,7 +198,7 @@ class BusinessConnect(PrimaryUUIDTimeStampedModel):
         verbose_name_plural = "Business Connects"
 
 
-class OrderStatus(PrimaryUUIDTimeStampedModel):
+class OrderStatus(TimeStampedModel):
 
     status = models.CharField(
         max_length=255, choices=ORDER_STATUS_CHOICES, default="pending"

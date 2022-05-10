@@ -63,8 +63,8 @@ class BusinessConnectAdmin(admin.ModelAdmin):
 
     list_display = [
         "id",
-        "dentist",
-        "laboratory",
+        "from_business",
+        "to_business",
         "is_active",
         "created_at",
         "modified_at",
