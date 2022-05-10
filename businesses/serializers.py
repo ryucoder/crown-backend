@@ -1,7 +1,6 @@
 from pprint import pprint
 
 from django.db import transaction
-from django.db.models import Prefetch
 
 from django.core.validators import EmailValidator
 
@@ -434,6 +433,7 @@ class BusinessWithOwnerSerializer(ServerErrorSerializer):
 
 class OrderSerializer(ServerErrorModelSerializer):
 
+    order_type = serializers.ChoiceField(read_only=True, choices=["placed", "received"])
     job_types = JobTypeSerializer(read_only=True, many=True)
     to_business = BusinessOnlySerializer(read_only=True)
     from_business = BusinessOnlySerializer(read_only=True)
@@ -519,6 +519,7 @@ class OrderSerializer(ServerErrorModelSerializer):
         model = Order
         fields = [
             # "to_user_id",
+            "order_type",
             "to_business_id",
             "job_types_ids",
             "id",

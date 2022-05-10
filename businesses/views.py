@@ -1,6 +1,6 @@
 from django.db.models import Q
 
-from rest_framework import serializers, status, viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -164,9 +164,20 @@ class OrderViewset(viewsets.ModelViewSet):
         user = EmailUser.objects.filter(id=self.request.user.pk).first()
         users_business = user.get_business()
 
-        queryset = Order.objects.filter(
-            Q(from_business=users_business) | Q(to_business=users_business)
-        ).order_by("-created_at")
+        queryset = (
+            Order.objects.filter(
+                Q(from_business=users_business) | Q(to_business=users_business)
+            )
+            .select_related("from_business")
+            .order_by("-created_at")
+        )
+
+        # TODO: Need to find a way to do this via annotate or do it at the time of creation
+        for order in queryset:
+            if order.from_business.id == users_business.id:
+                order.order_type = "placed"
+            else:
+                order.order_type = "received"
 
         return queryset
 
