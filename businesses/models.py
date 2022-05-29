@@ -33,7 +33,7 @@ class Business(TimeStampedModel):
     )
 
     connected_businesses = models.ManyToManyField(
-        "businesses.Business",
+        "self",
         related_name="conencted_business",
         blank=True,
         through="BusinessConnect",
@@ -120,7 +120,6 @@ class BusinessAddress(TimeStampedModel):
     ]
     name = models.CharField(max_length=255)
     address = models.TextField()
-    city = models.CharField(max_length=255)
     pincode = models.CharField(max_length=6)
     address_type = models.CharField(
         max_length=12, choices=ADDRESS_CHOICES, default="headquarters"

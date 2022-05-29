@@ -69,16 +69,7 @@ class BusinessViewset(viewsets.ModelViewSet):
         current_business = current_user.get_business()
 
         queryset = current_business.connected_businesses.all()
-        # queryset = BusinessConnect.objects.filter(laboratory_id=current_business.pk)
 
-        # dentist_ids = []
-        # for item in queryset:
-        #     if item.dentist not in dentist_ids:
-        #         dentist_ids.append(item.dentist.id)
-
-        # queryset = (
-        #     self.get_queryset().filter(id__in=dentist_ids).order_by("-created_at")
-        # )
         queryset = self.filter_queryset(queryset)
 
         page = self.paginate_queryset(queryset=queryset)
@@ -97,6 +88,7 @@ class BusinessViewset(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
 
         self.perform_create(serializer)
+
         headers = self.get_success_headers(serializer.data)
         return Response(
             serializer.data, status=status.HTTP_201_CREATED, headers=headers

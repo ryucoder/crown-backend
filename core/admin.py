@@ -1,6 +1,34 @@
 from django.contrib import admin
 
-from core.models import State, JobType
+from core.models import City, District, State, JobType
+
+
+@admin.register(City)
+class CityAdmin(admin.ModelAdmin):
+
+    list_display = [
+        "id",
+        "name",
+        "district",
+        "created_at",
+        "modified_at",
+    ]
+
+    list_per_page = 50
+
+
+@admin.register(District)
+class DistrictAdmin(admin.ModelAdmin):
+
+    list_display = [
+        "id",
+        "name",
+        "state",
+        "created_at",
+        "modified_at",
+    ]
+
+    list_per_page = 50
 
 
 @admin.register(State)

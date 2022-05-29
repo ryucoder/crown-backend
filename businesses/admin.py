@@ -159,6 +159,7 @@ class BusinessAddressAdmin(admin.ModelAdmin):
         "id",
         "name",
         "city",
+        "district",
         "state",
         "pincode",
         "address_type",

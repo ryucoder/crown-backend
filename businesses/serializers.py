@@ -11,7 +11,7 @@ from core.serializers import (
     ServerErrorModelSerializer,
     JobTypeSerializer,
 )
-from core.models import JobType, State
+from core.models import JobType, State, City, District
 
 from users.models import EmailUser
 
@@ -43,6 +43,12 @@ class BusinessOwnerUserSerializer(serializers.ModelSerializer):
             "is_email_verified",
             "is_mobile_verified",
         ]
+        read_only_fields = [
+            "business",
+            "user_type",
+            "is_email_verified",
+            "is_mobile_verified",
+        ]
 
 
 class BusinessOwnerSerializer(serializers.ModelSerializer):
@@ -57,6 +63,9 @@ class BusinessOwnerSerializer(serializers.ModelSerializer):
             "is_active",
             "created_at",
             "modified_at",
+        ]
+        read_only_fields = [
+            "business",
         ]
 
 
@@ -116,7 +125,27 @@ class BusinessAccountSerializer(serializers.ModelSerializer):
 
 
 class BusinessAddressSerializer(ServerErrorModelSerializer):
-    state_id = serializers.UUIDField(write_only=True)
+    city_id = serializers.IntegerField(write_only=True)
+    district_id = serializers.IntegerField(write_only=True)
+    state_id = serializers.IntegerField(write_only=True)
+
+    def validate_city_id(self, city_id):
+        queryset = City.objects.filter(id=city_id)
+
+        if not queryset.exists():
+            message = "server_absent"
+            raise serializers.ValidationError(message)
+
+        return queryset.first()
+
+    def validate_district_id(self, district_id):
+        queryset = District.objects.filter(id=district_id)
+
+        if not queryset.exists():
+            message = "server_absent"
+            raise serializers.ValidationError(message)
+
+        return queryset.first()
 
     def validate_state_id(self, state_id):
         queryset = State.objects.filter(id=state_id)
@@ -145,20 +174,30 @@ class BusinessAddressSerializer(ServerErrorModelSerializer):
     class Meta:
         model = BusinessAddress
         fields = [
+            "city_id",
+            "district_id",
             "state_id",
             "id",
             "name",
             "address",
             "city",
+            "district",
+            "state",
             "pincode",
             "address_type",
             "business",
-            "state",
             "is_default",
             "created_at",
             "modified_at",
         ]
-        read_only_fields = ["business", "state", "created_at", "modified_at"]
+        read_only_fields = [
+            "business",
+            "city",
+            "district",
+            "state",
+            "created_at",
+            "modified_at",
+        ]
 
     def create(self, validated_data):
         user = self.context["user"]
@@ -341,11 +380,10 @@ class BusinessOnlySerializer(serializers.ModelSerializer):
         read_only_fields = ["is_active"]
 
 
-class BusinessWithOwnerSerializer(ServerErrorSerializer):
+class BusinessWithOwnerSerializer(ServerErrorModelSerializer):
 
-    name = serializers.CharField(write_only=True, max_length=255)
+    name = serializers.CharField(max_length=255)
     gstin = serializers.CharField(
-        write_only=True,
         max_length=16,
         min_length=16,
         required=False,
@@ -354,48 +392,35 @@ class BusinessWithOwnerSerializer(ServerErrorSerializer):
         trim_whitespace=True,
     )
     website = serializers.URLField(
-        write_only=True,
         required=False,
         allow_null=True,
         allow_blank=True,
         trim_whitespace=True,
     )
-    category = serializers.ChoiceField(write_only=True, choices=CATEGORY_CHOICES)
-    first_name = serializers.CharField(write_only=True, max_length=255)
-    last_name = serializers.CharField(write_only=True, max_length=255)
-    email = serializers.EmailField(write_only=True)
-    mobile = serializers.CharField(
-        write_only=True,
-        max_length=10,
-        min_length=10,
-        required=False,
-        allow_null=True,
-        allow_blank=True,
-        trim_whitespace=True,
-    )
+    category = serializers.ChoiceField(choices=CATEGORY_CHOICES)
+
+    owner = BusinessOwnerUserSerializer(write_only=True)
+    address = BusinessAddressSerializer(write_only=True)
 
     class Meta:
+        model = Business
         fields = [
             "id",
             "name",
             "gstin",
             "website",
             "category",
-            "first_name",
-            "last_name",
-            "email",
-            "mobile",
+            "owner",
+            "address",
         ]
 
     def create(self, validated_data):
         user = self.context["user"]
 
-        # user
-        # business
-        # business owner
-        # business connect
+        address = dict(validated_data["address"])
+        owner = dict(validated_data["owner"])
 
-        mobile = validated_data["mobile"]
+        mobile = owner.get("mobile")
 
         if mobile is not None and len(mobile.strip()) == 10:
             mobile = int(mobile)
@@ -403,30 +428,44 @@ class BusinessWithOwnerSerializer(ServerErrorSerializer):
             mobile = 0
 
         email_user = EmailUser()
-        email_user.first_name = validated_data["first_name"]
-        email_user.last_name = validated_data["last_name"]
-        email_user.email = validated_data["email"]
+        email_user.first_name = owner["first_name"]
+        email_user.last_name = owner["last_name"]
+        email_user.email = owner["email"]
         email_user.mobile = mobile
         email_user.user_type = "owner"
+
+        current_business = user.get_business()
 
         business = Business()
         business.name = validated_data["name"]
         business.category = validated_data["category"]
         business.gstin = validated_data["gstin"]
         business.website = validated_data["website"]
-        business.referral = user.get_business()
+        business.referral = current_business
         business.is_claimed = False
 
-        owner = BusinessOwner()
-        owner.business = business
-        owner.owner = email_user
-        owner.is_active = True
+        business_owner = BusinessOwner()
+        business_owner.business = business
+        business_owner.owner = email_user
+        business_owner.is_active = True
+
+        business_address = BusinessAddress()
+        business_address.city = address["city_id"]
+        business_address.district = address["district_id"]
+        business_address.state = address["state_id"]
+        business_address.is_default = True
+        business_address.address_type = "headquarters"
+        business_address.address = address["address"]
+        business_address.pincode = address["pincode"]
+        business_address.name = address["name"]
+        business_address.business = business
 
         with transaction.atomic():
             email_user.save()
             business.save()
-            owner.save()
-            business.connected_businesses.add(user.get_business())
+            business_owner.save()
+            business_address.save()
+            business.connected_businesses.add(current_business)
 
         return business
 
@@ -441,10 +480,10 @@ class OrderSerializer(ServerErrorModelSerializer):
     to_user = BusinessOwnerUserSerializer(read_only=True)
 
     job_types_ids = serializers.ListField(
-        child=serializers.UUIDField(), write_only=True
+        child=serializers.IntegerField(), write_only=True
     )
 
-    to_business_id = serializers.UUIDField(write_only=True)
+    to_business_id = serializers.IntegerField(write_only=True)
 
     def __init__(self, *args, **kwargs):
 
