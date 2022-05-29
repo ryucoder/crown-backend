@@ -2,13 +2,30 @@ from pprint import pprint
 
 from rest_framework import serializers
 
-from core.models import State, JobType
+from core.models import City, District, State, JobType
+
+
+class CitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = City
+        fields = ["id", "name", "district"]
+
+
+class DistrictSerializer(serializers.ModelSerializer):
+    cities = CitySerializer(many=True)
+
+    class Meta:
+        model = District
+        fields = ["id", "name", "state", "cities"]
 
 
 class StateSerializer(serializers.ModelSerializer):
+
+    districts = DistrictSerializer(many=True)
+
     class Meta:
         model = State
-        fields = ["id", "name", "gst_code"]
+        fields = ["id", "name", "gst_code", "districts"]
 
 
 class JobTypeSerializer(serializers.ModelSerializer):
