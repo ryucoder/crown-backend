@@ -422,7 +422,7 @@ class BusinessWithOwnerSerializer(ServerErrorModelSerializer):
 
         mobile = owner.get("mobile")
 
-        if mobile is not None and len(mobile.strip()) == 10:
+        if mobile is not None and len(str(mobile).strip()) == 10:
             mobile = int(mobile)
         else:
             mobile = 0
