@@ -68,7 +68,7 @@ class BusinessViewset(viewsets.ModelViewSet):
 
         current_business = current_user.get_business()
 
-        queryset = current_business.connected_businesses.all()
+        queryset = current_business.connected_businesses.all().order_by("-created_at")
 
         queryset = self.filter_queryset(queryset)
 
